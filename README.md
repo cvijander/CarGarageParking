@@ -28,7 +28,7 @@ public class Vehicle
 
      public ICollection<VehicleInGarage> VehicleInGarage { get;set; } = new List<VehicleInGarage>(); 
  }
-``` csharp
+```
 
 ### VehicleInGarage
 ```csharp
@@ -64,7 +64,7 @@ public class Vehicle
      }
 
  }
-```csharp
+```
 
 ### Payment
 ```csharp
@@ -80,7 +80,7 @@ public class Vehicle
 
      public VehicleInGarage VehicleInGarage { get; set; } = null!;
  }
-```csharp
+```
 
 
 
