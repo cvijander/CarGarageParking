@@ -107,7 +107,7 @@ public class Owner
     public string LastName { get; set; }
 
 }
-
+```
 
 ## Instrukcije za instalaciju i pokretanje
 1. Klonirajte repozitorijum:
