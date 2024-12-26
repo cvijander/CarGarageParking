@@ -4,11 +4,11 @@
 Ova aplikacija omogucava nam da pratimo kad je neko vozilo uslo, izaslo iz garaze, uz evidencije vremena i placanja i istorije poseta, kao i kreiranje novih garaza i vozila. 
 
 ## Osnovne funkcionalnosti 
--Pravljenje novih garaza 
--Pravljanje novih vozila 
--Ulazak i izlazk iz garaza 
--Naplata 
--Istorija boravka vozila u garazi 
+- Pravljenje novih garaza 
+- Pravljanje novih vozila 
+- Ulazak i izlazk iz garaza 
+- Naplata 
+- Istorija boravka vozila u garazi 
 
 
 ## Struktura modela 
