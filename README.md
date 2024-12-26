@@ -140,7 +140,12 @@ public class Owner
 
 
 ## istorija radova 
-### kreiranje modela koji su navedeni Vehicle, VehicleInGarage, Garage, Owner, Payment
+### 1)  Kreiranje modela koji su navedeni 
+- Vehicle,
+- VehicleInGarage,
+- Garage,
+- Owner,
+- Payment
 
 
 
