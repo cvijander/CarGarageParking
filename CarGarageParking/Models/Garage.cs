@@ -10,6 +10,6 @@
 
         public int Capacity { get; set; }
 
-        public List<VehicleInGarage> VehicleInGarage { get;set; } = new List<VehicleInGarage>(); 
+        public ICollection<VehicleInGarage> VehicleInGarage { get;set; } = new List<VehicleInGarage>(); 
     }
 }
