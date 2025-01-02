@@ -8,10 +8,35 @@ Ova aplikacija omogucava nam da pratimo kad je neko vozilo uslo, izaslo iz garaz
 - Pravljanje novih vozila 
 - Ulazak i izlazk iz garaza 
 - Naplata 
-- Istorija boravka vozila u garazi 
+- Istorija boravka vozila u garazi
+- Aplikacija ako korisnik je registrovan clan 
 
 
 ## Struktura modela 
+
+Application predstavlja model koji povezuje korisnika (Owner) sa njegovim vozilima i kreditima u aplikaciji.
+### Application
+```csharp
+public class Application
+{
+    public int ApplicationId { get; set; }
+
+    public int OwnerId { get; set; }
+
+    public Owner Owner { get; set; }
+
+    public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
+    public decimal Credit { get; set; }
+
+    public bool HasActiveMembership { get; set; }   
+}
+```
+- `ApplicationId`: jedinstvaeni identifikator 
+- `OwnerId`: strani kljuc ka entitetu `Owner`
+- `Vehicles`: kolekcija vozila povezanih sa apliakacijom
+- `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja
+-  `HasActiveMembership`: Da li korisnik ima aktivno clanstvo  
 
 Vehicle je model za osnovne podatke o vozilu, koja ima njegov geristarski broj i podaci o vlasniku 
 ### Vehicle (Vozilo)
