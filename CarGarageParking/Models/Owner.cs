@@ -8,7 +8,7 @@
 
         public string LastName { get; set; }
 
-        public ICollection<Vehicle> vehicles { get; set; } = new List<Vehicle>();
+        public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 
     }
 }
