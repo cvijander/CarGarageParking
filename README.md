@@ -46,18 +46,25 @@ public class Application
 Vehicle je model za osnovne podatke o vozilu, koja ima njegov geristarski broj i podaci o vlasniku. 
 
 ### Vehicle (Vozilo)
+
 ```csharp
 public class Vehicle
 {
-    public int Id { get; set; }
+    public int VehicleId { get; set; }
 
     public string LicencePlate { get; set; }
 
-    public int OwnerId { get; set; }
+    public int? OwnerId { get; set; }
 
-    public Owner Owner { get; set; }
+    public Owner? Owner { get; set; }
 }
 ```
+- `VehicleId` : jedinstveni identifikator.
+- `LicencePlate` : registracioni broj vozila.
+- `OwnerId`: strani kljuc ka entitetu `Owner`.
+- 'Owner' : veza ka korisniku `Owner`.
+
+
 Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenutnu zauzetost , slobodnoa mesta  i listu vozila koja su trenutno u njoj.
 
 ### Garage 
@@ -100,42 +107,51 @@ Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenut
 -  `VehicleInGarage` : kolekcija vozila koja se trenutno nalaze u garazi.
 
 
-Ovaj model predstavlja vezu izmedju vozila sa jedne strane i garaze sa druge i to fizicki predstavlja vozilo u garazi, koje ima svoj id. Takodje sadrzi spoljne kljuceve ka Vehicle i Garazi i od dodatnik properitija vremena ulaska i izlaska, kao i cene naplate i cene po satu
+Ovaj model predstavlja vezu izmedju vozila sa jedne strane i garaze sa druge i to fizicki predstavlja vozilo u garazi, koje ima svoj id. Takodje sadrzi spoljne kljuceve ka Vehicle i Garazi i od dodatnik properitija vremena ulaska i izlaska, kao i cene po satu i proveru da li je vozilo jos uvek u garazi.
+
 ### VehicleInGarage
+
 ```csharp
- public class VehicleInGarage
- {
-     public int VehicleInGarageId { get; set; }
+public class VehicleInGarage
+{
+    public int VehicleInGarageId { get; set; }
 
-     public int VehicleId { get; set; }
+    public int VehicleId { get; set; }
 
-     public Vehicle Vehicle { get; set; }
+    public Vehicle Vehicle { get; set; }
 
-     public int GarageId { get; set; }
+    public int GarageId { get; set; }
 
-     public Garage Garage  { get; set; }
+    public Garage Garage  { get; set; }
 
-     public DateTime EntryTime { get; set; }
+    public DateTime EntryTime { get; set; }
 
-     public DateTime? ExitTime { get; set; }
+    public DateTime? ExitTime { get; set; }
 
-     public decimal HourlyRate { get; set; }
-     public decimal? TotalCharge { get; set; }
+    public decimal HourlyRate { get; set; }
 
-     public void CalculateTotalCharge()
-     {
-         if(ExitTime == null)
-         {
-             throw new InvalidDataException("Exit time must be before calculating");
-         }
+    public int? OwnerId { get; set; }
 
-         var duration = ExitTime.Value - EntryTime;
-         var totalHours = Math.Ceiling(duration.TotalHours);
-         TotalCharge = (decimal)totalHours * HourlyRate;
-     }
+    public Owner? Owner { get; set; }
 
- }
+    public bool IsVehicleStillInGarage { get; set; } = true;   
+    
+}
 ```
+
+- `VehicleInGarageId` : jedinstevni identifikator.
+- `VehicleId` : strani kljuc ka entititenu `Vehicle`.
+- `Vehicle`: veza ka entitetu `Vehicle` .
+- `GarageId`: strani kljuc ka entitetu `Garage`.
+- `Garage` : veza ka entitetu `Garage`.
+- `EntryTime` : vreme ulaska u vozila u garazu.
+- `ExitTime` : vreme izlaska vozila iz garaze.
+- `HourlyRate` : cena po satu parkiranja.
+- `OwnerId` : strani kljuc ka entitetu `Owner`.
+- `Owner` : veza ka entititu `Owner`.
+- `IsVehicleStillInGarage` : proverava da li je vozilo jos u garazi.
+  
+
 Ovaj model je zaduzen za placanje, koji povezuje koja je ukupna kolicina placenja, kad i koje vozilo koje je bilo u garazi ja zaduzeno za taj iznos 
 ### Payment
 ```csharp
