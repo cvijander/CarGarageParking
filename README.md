@@ -14,6 +14,7 @@ Ova aplikacija omogucava nam da pratimo kad je neko vozilo uslo, izaslo iz garaz
 
 ## Struktura modela 
 
+## A
 
 Application predstavlja model koji povezuje korisnika (Owner) sa njegovim vozilima i kreditima u aplikaciji.
 
@@ -42,6 +43,7 @@ public class Application
 - `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja.
 - `HasActiveMembership`: Da li korisnik ima aktivno clanstvo.  
 
+## V
 
 Vehicle je model za osnovne podatke o vozilu, koja ima njegov geristarski broj i podaci o vlasniku. 
 
@@ -64,6 +66,7 @@ public class Vehicle
 - `OwnerId`: strani kljuc ka entitetu `Owner`.
 - 'Owner' : veza ka korisniku `Owner`.
 
+## G
 
 Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenutnu zauzetost , slobodnoa mesta  i listu vozila koja su trenutno u njoj.
 
@@ -106,6 +109,7 @@ Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenut
 -  `IsFull` : oznaka da li je garaza puna , oznacava  da je broj zauzatih mesta  veci ili jednak ukupnom broju parking mesta.
 -  `VehicleInGarage` : kolekcija vozila koja se trenutno nalaze u garazi.
 
+## VIG
 
 Ovaj model predstavlja vezu izmedju vozila sa jedne strane i garaze sa druge i to fizicki predstavlja vozilo u garazi, koje ima svoj id. Takodje sadrzi spoljne kljuceve ka Vehicle i Garazi i od dodatnik properitija vremena ulaska i izlaska, kao i cene po satu i proveru da li je vozilo jos uvek u garazi.
 
@@ -150,7 +154,8 @@ public class VehicleInGarage
 - `OwnerId` : strani kljuc ka entitetu `Owner`.
 - `Owner` : veza ka entititu `Owner`.
 - `IsVehicleStillInGarage` : proverava da li je vozilo jos u garazi.
-  
+
+  ## P
 
 Ovaj model je zaduzen za placanje, koji povezuje koja je ukupna kolicina placenja, kad i koje vozilo koje je bilo u garazi ja zaduzeno za taj iznos 
 
@@ -181,6 +186,8 @@ Ovaj model je zaduzen za placanje, koji povezuje koja je ukupna kolicina placenj
 - `ExpirationTime` : vreme do kada vozilo mora da napusti garazu ili krece nova naplata.
 - `VehicleInGarage`: strani kljuc  ka entitetu `VehicleInGarage`.
 - `VehicleInGarage` : veza ka entitetu `VehicleInGarage`.
+
+  ## O
   
 Model koji predstavlja vlasnika ili vec korisnika vozila, zbog kasnijeg prosirenja aplikacije, kao bi imali podatke o njemu  i odredjene popuste .
 ### Owner
