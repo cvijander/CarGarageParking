@@ -14,8 +14,11 @@ Ova aplikacija omogucava nam da pratimo kad je neko vozilo uslo, izaslo iz garaz
 
 ## Struktura modela 
 
+
 Application predstavlja model koji povezuje korisnika (Owner) sa njegovim vozilima i kreditima u aplikaciji.
+
 ### Application
+
 ```csharp
 public class Application
 {
@@ -32,13 +35,16 @@ public class Application
     public bool HasActiveMembership { get; set; }   
 }
 ```
-- `ApplicationId`: jedinstvaeni identifikator 
-- `OwnerId`: strani kljuc ka entitetu `Owner`
-- `Vehicles`: kolekcija vozila povezanih sa apliakacijom
-- `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja
--  `HasActiveMembership`: Da li korisnik ima aktivno clanstvo  
 
-Vehicle je model za osnovne podatke o vozilu, koja ima njegov geristarski broj i podaci o vlasniku 
+- `ApplicationId`: jedinstvaeni identifikator. 
+- `OwnerId`: strani kljuc ka entitetu `Owner`.
+- `Vehicles`: kolekcija vozila povezanih sa apliakacijom.
+- `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja.
+- `HasActiveMembership`: Da li korisnik ima aktivno clanstvo.  
+
+
+Vehicle je model za osnovne podatke o vozilu, koja ima njegov geristarski broj i podaci o vlasniku. 
+
 ### Vehicle (Vozilo)
 ```csharp
 public class Vehicle
@@ -52,22 +58,48 @@ public class Vehicle
     public Owner Owner { get; set; }
 }
 ```
-Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet i listu vozila koja su trenutno u njoj.
+Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenutnu zauzetost , slobodnoa mesta  i listu vozila koja su trenutno u njoj.
+
 ### Garage 
+
 ```csharp
  public class Garage
- {
-     public int Id { get; set; }
+{
+    public int GarageId { get; set; }
 
-     public string Name { get; set; }
+    public string Name { get; set; }
 
-     public string Location { get; set; }
+    public string Location { get; set; }
 
-     public int Capacity { get; set; }
+    public int Capacity { get; set; }
 
-     public ICollection<VehicleInGarage> VehicleInGarage { get;set; } = new List<VehicleInGarage>(); 
- }
+    public int CurrentOccupancy { get; set; }
+
+    public int AvailableSpots { get
+        {
+            return Capacity - CurrentOccupancy;
+        }
+    }
+    public ICollection<VehicleInGarage> VehicleInGarage { get;set; } = new List<VehicleInGarage>(); 
+
+    public bool IsFull { get
+        {
+             return CurrentOccupancy >= Capacity;
+        } 
+    }
+}
 ```
+
+- `GarageId` : jedinstveni identifikator.
+-  `Name` : ime garaze.
+-  `Location` : lokacija garaze.
+-  'Capacity' : ukupan broj parking mesta.
+-  `CurrentIccupancy` : broj trenutno zauzetih mesta
+-  `AvailableSposts` : broj slobodnih mesta koji se automatski izracunava oduzimanjem ukupnog broja sa brojem trenutno zauzetih mesta.
+-  `IsFull` : oznaka da li je garaza puna , oznacava  da je broj zauzatih mesta  veci ili jednak ukupnom broju parking mesta.
+-  `VehicleInGarage` : kolekcija vozila koja se trenutno nalaze u garazi.
+
+
 Ovaj model predstavlja vezu izmedju vozila sa jedne strane i garaze sa druge i to fizicki predstavlja vozilo u garazi, koje ima svoj id. Takodje sadrzi spoljne kljuceve ka Vehicle i Garazi i od dodatnik properitija vremena ulaska i izlaska, kao i cene naplate i cene po satu
 ### VehicleInGarage
 ```csharp
