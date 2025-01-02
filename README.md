@@ -153,21 +153,35 @@ public class VehicleInGarage
   
 
 Ovaj model je zaduzen za placanje, koji povezuje koja je ukupna kolicina placenja, kad i koje vozilo koje je bilo u garazi ja zaduzeno za taj iznos 
+
 ### Payment
+
 ```csharp
  public class Payment
- {
-     public int Id { get; set; } 
+{
+    public int PaymentId { get; set; }
 
-     public decimal Amount { get; set; }
+    public decimal TotalCharge { get; set; }
 
-     public DateTime PaymentTime { get; set; }
+    public bool IsPaid { get; set; }
 
-     public int VehicleInGarageId { get; set; }
+    public DateTime PaymentTime { get; set; }
 
-     public VehicleInGarage VehicleInGarage { get; set; } = null!;
- }
+    public DateTime ExpirationTime { get; set; }  // payment time + 15 minuta ili krece novi obracun 
+
+    public int VehicleInGarageId { get; set; }
+
+    public VehicleInGarage VehicleInGarage { get; set; } = null!;
+}
 ```
+- `PaymentId` : jedinsteni identifikator.
+- `TotalCharge`: ukupan iznos za placanje.
+- `IsPaid`: provera da li je racun placen.
+- `PaymentTime` : vreme kad je placanje izvrseno.
+- `ExpirationTime` : vreme do kada vozilo mora da napusti garazu ili krece nova naplata.
+- `VehicleInGarage`: strani kljuc  ka entitetu `VehicleInGarage`.
+- `VehicleInGarage` : veza ka entitetu `VehicleInGarage`.
+  
 Model koji predstavlja vlasnika ili vec korisnika vozila, zbog kasnijeg prosirenja aplikacije, kao bi imali podatke o njemu  i odredjene popuste .
 ### Owner
 ```csharp
@@ -179,8 +193,16 @@ public class Owner
 
     public string LastName { get; set; }
 
+    public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
 }
 ```
+- `OwnerId` : jedisnteveni identifikator.
+- `FirstName` : ime korisnika.
+- `LastName` : prezime korisnika.
+- `Vehicles` : kolekcija vozila koje korisnik poseduje.
+
+   
 
 ## Instrukcije za instalaciju i pokretanje
 1. Klonirajte repozitorijum:
