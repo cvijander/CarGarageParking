@@ -29,7 +29,7 @@ namespace CarGarageParking.Controllers
             return View(owners);
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Info(int id)
         {
             IEnumerable<Owner> owners = GetAllOwners();
 

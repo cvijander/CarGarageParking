@@ -28,7 +28,7 @@
             <h2>Name: @singleOwner.FirstName</h2>
             <h3>Lastname: @singleOwner.LastName</h3>
             <p>Number of cars: @singleOwner.Vehicles.Count()</p>
-            <a href="@Url.Action("Details","Owner", new {id = singleOwner.OwnerId})">View more details about cars</a>
+            <a href="@Url.Action("Info","Owner", new {id = singleOwner.OwnerId})">View more info about cars</a>
         </div>
     }
 </div>
