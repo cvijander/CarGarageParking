@@ -1,0 +1,67 @@
+﻿@model IEnumerable<CarGarageParking.Models.Garage>
+
+    @{
+        ViewData["Title"] = "Show all garages";
+    }
+  
+ 
+    <form asp-action="Index" asp-controller="Garage" method="get">
+        <label for="name">Name:</label> 
+        <input type="text" id="name" name="name" value="@Context.Request.Query["name"]" />
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" value="@Context.Request.Query["location"]" />
+
+        <label for="maxCapacity">Capacity</label>
+        <input type="number" id="maxCapacity" name="maxCapacity" value="@Context.Request.Query["maxCapacity"]" />
+
+        <label for="availableSpots">Available spots</label>
+        <input type="number" id="availableSpots"  name="availableSpots" value="@Context.Request.Query["availableSpots"]" />
+
+          <!--   <label for="percent">Procenat popunjenosti</label>-->
+        <!--  <input type="number" id="percent" name="percent" value="@Context.Request.Query["percent"]" />-->
+        
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+
+
+    <div class="garage-list">
+        @foreach(Garage singleGarage in Model)
+    {
+        <div class="garage-solo">
+            <hr />
+            <h2>Naziv garaze: @singleGarage.Name</h2>
+            <h3>Broj slobodnih mesta: @singleGarage.AvailableSpots</h3>
+            @{
+                decimal OcupancyPercent = ((decimal)singleGarage.CurrentOccupancy / singleGarage.Capacity)*100;
+            }
+
+            <h3>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</h3>           
+            <h3>Da li je garaza puna? @(singleGarage.IsFull? "Jeste":"Nije")</h3>
+            <a href="@Url.Action("Info","Garage", new {Id = singleGarage.GarageId})">View more info</a>
+            <hr />
+        </div>
+    }
+
+    </div>
+
+
+
+
+    <style>
+
+    .garage-solo {
+        background-color: burlywood;
+        margin:15px;
+        padding-left:15px;
+    }
+        hr{
+            color:darkred;
+
+        }
+    </style>
+
+
+

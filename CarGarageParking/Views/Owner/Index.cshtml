@@ -1,0 +1,62 @@
+﻿@model IEnumerable<CarGarageParking.Models.Owner>
+
+@{
+    ViewData["Title"] = "Hello Owner";
+}
+
+<form asp-action="Index" asp-controller="Owner" method="get">
+
+     <label for="firstName">First name</label>
+     <input type="text" id="firstName" name="firstName" value="@Context.Request.Query["firstName"]" />
+
+     <label for="lastName">Last name</label>
+     <input type="text" id="lastName" name="lastName" value="@Context.Request.Query["lastName"]" />
+
+     <label for="numberOfCars">Number of cars</label>
+     <input type="number" id="numberOfCars" name="numberOfCars" step="1" min="1" value="@Context.Request.Query["numberOfCars"]" />
+
+     <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+
+<h1>Collection of owners</h1>
+
+<div>
+    @foreach (Owner singleOwner  in Model)
+    {
+        <div class="owner-card-look">
+            <h2>Name: @singleOwner.FirstName</h2>
+            <h3>Lastname: @singleOwner.LastName</h3>
+            <p>Number of cars: @singleOwner.Vehicles.Count()</p>
+            <a href="@Url.Action("Details","Owner", new {id = singleOwner.OwnerId})">View more details about cars</a>
+        </div>
+    }
+</div>
+
+
+<style>
+    .owner-card-look
+    {
+        border:1px solid gray;
+        border-radius: 15px;
+        margin:10px;
+        padding: 15px;
+        background-color: cadetblue;
+        color: white;
+    }
+
+    .owner-card-look a {
+        color: yellow;
+        text-align:center;
+        text-decoration:none;
+        text-transform:uppercase;
+    }
+
+    .owner-card-look a:hover {
+        
+        color: white;
+        text-align: center;
+        text-decoration:none;
+        text-transform: lowercase;
+    }
+</style>
