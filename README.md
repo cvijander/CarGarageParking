@@ -250,5 +250,21 @@ public class Owner
 - Payment,
 - Application
 
+- ### 2)  Kreiranje controlera koji su navedeni 
+- **OwnerControler,**
+- VehicleInGarage,
+- **GarageControler,**
+- Owner,
+- Payment,
+- Application
+
+-  ### 3)  Kreiranje View za modele koji su navedeni 
+- **Owner** - `Index`, `Info`
+- VehicleInGarage,
+- **Garage** -`Index`,`Info`
+- Owner,
+- Payment,
+- Application
+
 
 
