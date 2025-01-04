@@ -290,9 +290,9 @@ public class Application
 ```
 
 - `ApplicationId`: jedinstvaeni identifikator. 
-- `OwnerId`: strani kljuc ka entitetu `Owner`.
+- `OwnerId`: strani kljuc ka entitetu `Owner`. neophodno properti
 - `Vehicles`: kolekcija vozila povezanih sa apliakacijom.
-- `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja.
+- `Credit`: Kredit koji korisnik moze da koristi za popuste ili placanja. - mora da ima vrednost vecu od 0 
 - `HasActiveMembership`: Da li korisnik ima aktivno clanstvo.  
 
 ## V
@@ -306,6 +306,9 @@ public class Vehicle
 {
     public int VehicleId { get; set; }
 
+    [Required(ErrorMessage = "Licence plate is required.")]
+    [StringLength(15,ErrorMessage = "Licence plate can not exced 15 characters.")]
+
     public string LicencePlate { get; set; }
 
     public int? OwnerId { get; set; }
@@ -314,7 +317,7 @@ public class Vehicle
 }
 ```
 - `VehicleId` : jedinstveni identifikator.
-- `LicencePlate` : registracioni broj vozila.
+- `LicencePlate` : registracioni broj vozila. neophodan properti i mora da ima do 15 karaktera 
 - `OwnerId`: strani kljuc ka entitetu `Owner`.
 - 'Owner' : veza ka korisniku `Owner`.
 
@@ -362,10 +365,10 @@ Garaza je ima osnove podatke o sebi, kao sto su ime, lokacija, kapacitet, trenut
 ```
 
 - `GarageId` : jedinstveni identifikator.
--  `Name` : ime garaze.
--  `Location` : lokacija garaze.
--  'Capacity' : ukupan broj parking mesta.
--  `CurrentIccupancy` : broj trenutno zauzetih mesta
+-  `Name` : ime garaze. neophdan properti i da je duzina do 100 karaktera 
+-  `Location` : lokacija garaze. neophdan properti i da je duzina do 150 karaktera 
+-  'Capacity' : ukupan broj parking mesta. Vrednost  da je od 0 do max 
+-  `CurrentIccupancy` : broj trenutno zauzetih mesta  Vrednost da je od 0 do max i da poredi od capacity 
 -  `AvailableSposts` : broj slobodnih mesta koji se automatski izracunava oduzimanjem ukupnog broja sa brojem trenutno zauzetih mesta.
 -  `IsFull` : oznaka da li je garaza puna , oznacava  da je broj zauzatih mesta  veci ili jednak ukupnom broju parking mesta.
 -  `VehicleInGarage` : kolekcija vozila koja se trenutno nalaze u garazi.
@@ -387,7 +390,7 @@ public class VehicleInGarage
     public Vehicle Vehicle { get; set; }
 
     
-    
+    [Required]
     public int GarageId { get; set; }
 
     public Garage Garage  { get; set; }
@@ -418,13 +421,13 @@ public class VehicleInGarage
 ```
 
 - `VehicleInGarageId` : jedinstevni identifikator.
-- `VehicleId` : strani kljuc ka entititenu `Vehicle`.
+- `VehicleId` : strani kljuc ka entititenu `Vehicle`. neophodan properti
 - `Vehicle`: veza ka entitetu `Vehicle` .
-- `GarageId`: strani kljuc ka entitetu `Garage`.
+- `GarageId`: strani kljuc ka entitetu `Garage`.   neophodan properti
 - `Garage` : veza ka entitetu `Garage`.
-- `EntryTime` : vreme ulaska u vozila u garazu.
-- `ExitTime` : vreme izlaska vozila iz garaze.
-- `HourlyRate` : cena po satu parkiranja.
+- `EntryTime` : vreme ulaska u vozila u garazu.  neopdodan properti i da je tipa date
+- `ExitTime` : vreme izlaska vozila iz garaze.  neopdodan properti i da je tipa date i da poredi se sa exit time
+- `HourlyRate` : cena po satu parkiranja.  neophodan properti i da ima vrednost od 0 do max
 - `OwnerId` : strani kljuc ka entitetu `Owner`.
 - `Owner` : veza ka entititu `Owner`.
 - `IsVehicleStillInGarage` : proverava da li je vozilo jos u garazi.
@@ -464,11 +467,11 @@ Ovaj model je zaduzen za placanje, koji povezuje koja je ukupna kolicina placenj
 }
 ```
 - `PaymentId` : jedinsteni identifikator.
-- `TotalCharge`: ukupan iznos za placanje.
+- `TotalCharge`: ukupan iznos za placanje.  da je vrednost veca od 0 do max i da mora da bude veca od vehicleHourlyRate
 - `IsPaid`: provera da li je racun placen.
-- `PaymentTime` : vreme kad je placanje izvrseno.
-- `ExpirationTime` : vreme do kada vozilo mora da napusti garazu ili krece nova naplata.
-- `VehicleInGarage`: strani kljuc  ka entitetu `VehicleInGarage`.
+- `PaymentTime` : vreme kad je placanje izvrseno.  neophodan properi i da je i da je tipa datetime 
+- `ExpirationTime` : vreme do kada vozilo mora da napusti garazu ili krece nova naplata. neophodan properi i da je i da je tipa datetime  i poredjene sa  payment time 
+- `VehicleInGarageId`: strani kljuc  ka entitetu `VehicleInGarage`.  neophoddan properti
 - `VehicleInGarage` : veza ka entitetu `VehicleInGarage`.
 
   ## O
@@ -493,8 +496,8 @@ public class Owner
 }
 ```
 - `OwnerId` : jedisnteveni identifikator.
-- `FirstName` : ime korisnika.
-- `LastName` : prezime korisnika.
+- `FirstName` : ime korisnika. neophodan properti i duzina do 50 karaktera
+- `LastName` : prezime korisnika.  neophodan properti i duzina do 50 karaktera 
 - `Vehicles` : kolekcija vozila koje korisnik poseduje.
 
 
