@@ -502,6 +502,8 @@ public class Owner
 
 
 ### Util folder koji sadrzi custom klase za validaciju 
+
+### DateGreaterThanAttribute
 ```csharp
  public class DateGreaterThanAttribute: ValidationAttribute
  {
@@ -542,15 +544,15 @@ public class Owner
 
          return ValidationResult.Success;
      }
-
-
  }
 ```
-- Sluzi za poredjenje raznih vremena u nasoj aplikaciji
 
 
+ Sluzi za poredjenje raznih vremena u nasoj aplikaciji
 
-  ```csharp
+### IntTypeGreaterThan
+
+```csharp
 public class IntTypeGreaterThan :ValidationAttribute
 {
        private readonly string _comparisonProperty;
@@ -590,10 +592,8 @@ public class IntTypeGreaterThan :ValidationAttribute
 
             return ValidationResult.Success;
         }
-
-
     }
  ```
 
-- Sluzi za poredjenje raznih int vrednosti  u nasoj aplikaciji
+ Sluzi za poredjenje raznih int vrednosti  u nasoj aplikaciji
 
