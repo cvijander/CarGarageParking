@@ -593,6 +593,7 @@ public class IntTypeGreaterThan :ValidationAttribute
 
 
     }
-```
+ ```
+
 - Sluzi za poredjenje raznih int vrednosti  u nasoj aplikaciji
 
