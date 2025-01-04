@@ -266,5 +266,8 @@ public class Owner
 - Payment,
 - Application
 
+ -  ### 4)  Dodavanje datavalidation - validacije u okviru modela  
+
+
 
 
