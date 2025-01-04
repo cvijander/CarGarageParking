@@ -65,7 +65,7 @@ namespace CarGarageParking.Controllers
             vehicle2.LicencePlate = "SU123456";
             owner2.Vehicles.Add(vehicle2);
             Vehicle vehicel6 = new Vehicle();
-            vehicel6.LicencePlate = "VS9856";
+            vehicel6.LicencePlate = "V9999999999999999999S9856";
             owner2.Vehicles.Add(vehicel6);
 
             owners.Add(owner2);
