@@ -13,8 +13,8 @@ namespace CarGarageParking.Models
 
         public Vehicle Vehicle { get; set; }
 
-        
-        
+
+        [Required]
         public int GarageId { get; set; }
 
         public Garage Garage  { get; set; }

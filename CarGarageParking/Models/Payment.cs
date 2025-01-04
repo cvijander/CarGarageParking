@@ -25,7 +25,7 @@ namespace CarGarageParking.Models
         [Required]
         public int VehicleInGarageId { get; set; }
 
-
+        [Range(0.01,double.MaxValue, ErrorMessage = "Vehicle hourly rate must be greather than zero.")]
         public decimal VehicleHourlyRate { get; set; }
         public VehicleInGarage VehicleInGarage { get; set; } = null!;
     }
