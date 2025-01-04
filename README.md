@@ -501,6 +501,98 @@ public class Owner
 - `Vehicles` : kolekcija vozila koje korisnik poseduje.
 
 
+### Util folder koji sadrzi custom klase za validaciju 
+```csharp
+ public class DateGreaterThanAttribute: ValidationAttribute
+ {
+     private readonly string _comparisonProperty;
+
+     public DateGreaterThanAttribute(string comparisonProperty)
+     {
+         _comparisonProperty = comparisonProperty;
+     }
+
+     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+     {
+         if (value == null)
+         {
+             return ValidationResult.Success;
+         }
+
+         var currentValue = (DateTime?)value;
+
+         var comparisonProperty = validationContext.ObjectType.GetProperty(_comparisonProperty);
+
+         if (comparisonProperty == null)
+         {
+             return new ValidationResult($"Uknown property {_comparisonProperty}");
+         }
+
+         var comparisonValue = (DateTime?)comparisonProperty.GetValue(validationContext.ObjectInstance);
+
+         if (value == null || comparisonValue == null)
+         {
+             return ValidationResult.Success;
+         }
+
+         if (value != null && comparisonValue != null && currentValue <= comparisonValue)
+         {
+             return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} must be greater then {_comparisonProperty}");
+         }
+
+         return ValidationResult.Success;
+     }
 
 
+ }
+```
+- Sluzi za poredjenje raznih vremena u nasoj aplikaciji
+
+
+
+  ```csharp
+public class IntTypeGreaterThan :ValidationAttribute
+{
+       private readonly string _comparisonProperty;
+
+        public IntTypeGreaterThan(string comparisonProperty)
+        {
+            _comparisonProperty = comparisonProperty;
+        }
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            if (value == null)
+            {
+                return ValidationResult.Success;
+            }
+
+            var currentValue = (int)value;
+
+            var comparisonProperty = validationContext.ObjectType.GetProperty(_comparisonProperty);
+
+            if (comparisonProperty == null)
+            {
+                return new ValidationResult($"Uknown property {_comparisonProperty}");
+            }
+
+            var comparisonValue = (int)comparisonProperty.GetValue(validationContext.ObjectInstance);
+
+            if (value == null || comparisonValue == null)
+            {
+                return ValidationResult.Success;
+            }
+
+            if (value != null && comparisonValue != null && currentValue < comparisonValue)
+            {
+                return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} must be greater then {_comparisonProperty}");
+            }
+
+            return ValidationResult.Success;
+        }
+
+
+    }
+```
+- Sluzi za poredjenje raznih int vrednosti  u nasoj aplikaciji
 
