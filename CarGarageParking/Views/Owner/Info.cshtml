@@ -14,7 +14,12 @@
         @foreach(Vehicle vehicle in Model.Vehicles)
         {
             <li>Vehicle: @vehicle.LicencePlate</li>
-        }    
+        }
+        @foreach (Vehicle vehi in Model.Vehicles)
+        {
+            <li> @await Html.PartialAsync("_VehicleCard",vehi)</li>
+            
+        }
     </ul>
     <a href="@Url.Action("Index","Owner")">Back to index</a>
 </div>
