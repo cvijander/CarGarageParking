@@ -650,3 +650,6 @@ public class Payment :IValidatableObject
     }
 }
 ```
+
+Dodajemo IvalidateObject za proveru placanja cime mozemo da proverimo da li je placeno, da li je vreme napustanja garaze manje od 15 minuta u odnosu va vreme placanja, ako jeste onda je novi krug se pocinje, 
+takodje proveravamo da li je iznos novca koji treba platiti jednak ili vec manji od totalCharge 
