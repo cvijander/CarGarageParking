@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CarGarageParking.Models
 {
-    public class Payment
+    public class Payment :IValidatableObject
     {
         public int PaymentId { get; set; }
 
@@ -28,5 +28,28 @@ namespace CarGarageParking.Models
         [Range(0.01,double.MaxValue, ErrorMessage = "Vehicle hourly rate must be greather than zero.")]
         public decimal VehicleHourlyRate { get; set; }
         public VehicleInGarage VehicleInGarage { get; set; } = null!;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!IsPaid)
+            {
+                yield return new ValidationResult("Payment has not been completed", new[] { nameof(IsPaid)});
+            }
+
+            if ((DateTime.Now - PaymentTime).TotalMinutes > 15)
+            {
+                VehicleInGarage.EntryTime = ExpirationTime;
+
+                yield return new ValidationResult("You have exceed time to leave a garage, new cycle has started.", new[] { nameof(ExpirationTime) });
+            }
+
+            var totalHours = Math.Ceiling((PaymentTime - VehicleInGarage.EntryTime).TotalHours);
+            var reiquiredCharge = (decimal)totalHours * VehicleHourlyRate;
+
+            if(TotalCharge < reiquiredCharge)
+            {
+                yield return new ValidationResult($"Total charge must be at least {reiquiredCharge} based on hourly rate", new[] {nameof(TotalCharge) });
+            }
+        }
     }
 }
