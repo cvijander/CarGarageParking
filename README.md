@@ -871,7 +871,7 @@ namespace CarGarageParking.Services
 }
 ```
 
-- 4 - prevezujemo sada `OwnerController` tako da sada prihvata umesto `dbcontexta` privhata nas IOwnerServise
+- 4 - prevezujemo sada `OwnerController` tako da sada prihvata umesto `dbcontexta` privhata nas `IOwnerServise`
 
 
 ```csharp
@@ -931,3 +931,91 @@ namespace CarGarageParking.Controllers
     }
 }
 ```
+
+- 5 ista procedura je za ostale service dakle isto pravimo `IVehicleService` kao i klasu `VehicleService` - i naravno prosledjujemo na isti nacin u kontroler
+
+`IVehicleService`
+```csharp
+using CarGarageParking.Models;
+
+namespace CarGarageParking.Services
+{
+    public interface IVehicleService
+    {
+        IEnumerable<Vehicle> GetAllVehicles();
+
+        IEnumerable<Vehicle> GetVehicleByCondition(Func<Vehicle, bool> predicate);
+
+        Vehicle GetVehicleById(int id);
+
+        void CreateVehicle(Vehicle vehicle);
+
+        void UpdateVehicle(Vehicle vehicle);
+
+        void DeleteVehicle(int id);
+    }
+}
+```
+
+`VehicleService`
+
+```csharp
+using CarGarageParking.Models;
+
+namespace CarGarageParking.Services
+{
+    public class VehicleService : IVehicleService
+    {
+        private readonly CarGarageParkingDBContext _context;
+
+        public VehicleService(CarGarageParkingDBContext context)
+        {
+            _context = context;
+        }
+
+
+        public void CreateVehicle(Vehicle vehicle)
+        {
+            _context.Vehicles.Add(vehicle);
+            
+        }
+
+        public void DeleteVehicle(int id)
+        {
+            Vehicle vehicle = _context.Vehicles.Find(id);
+
+            if(vehicle != null)
+            {
+                _context.Vehicles.Remove(vehicle);
+                
+            }
+        }
+
+        public IEnumerable<Vehicle> GetAllVehicles()
+        {
+            return _context.Vehicles.ToList();
+        }
+
+        public IEnumerable<Vehicle> GetVehicleByCondition(Func<Vehicle, bool> predicate)
+        {
+            return _context.Vehicles.Where(predicate).ToList();
+        }
+
+        public Vehicle GetVehicleById(int id)
+        {
+            return _context.Vehicles.Find(id);
+        }
+
+        public void UpdateVehicle(Vehicle vehicle)
+        {
+            _context.Vehicles.Update(vehicle);
+            
+        }
+
+        
+    }
+}
+```
+
+
+  
