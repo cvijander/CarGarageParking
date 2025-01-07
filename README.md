@@ -1136,3 +1136,136 @@ namespace CarGarageParking.Controllers
 ```
 
 ### 8)  Dodavanje logera za proveru gresaka   
+ Dodavanje logera u nasoj aplikaciji ima dosta prednosti - dobijanjem infomracija od logova mozemo videti sta se desilo pre greske ili sta je prouzrovakovalo gresku,
+ performansa, imajuci infomracije o ponasanju koda tj upita mozemo videti da li odredjen ujpit trebamo usportiti, odloziti ili vec rasparcati na manje.
+ Mozemo beleziti infromacije o korisnicima aplikacije i celoj ponasanju aplikacije, da li postoji zagusenje i ceo put kretanja aplikacije i sta se moze unaprediti.
+
+- 1 - Dodajemo kod u `appsetting.json` 
+
+`appsetting.json` dodajemo liniju koda Microsoft.EntityFrameworkCore.Database.Command: "Information" – koji belezi sve sql upita koji se izvrsavaju.
+```csharp
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning",
+      "Microsoft.EnityFrameworkCore.Database.Command": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=DESKTOP-FEP7AFG\\SQLEXPRESS;Database=CarGarageDb;Trusted_Connection=True;MultipleActiveResultSets=True;Encrypt=False;"
+  },
+  "AllowedHosts": "*"
+}
+```
+ 
+- 2 -
+Dodavanje u `CarGarageParkingDBContext.cs`   - kreiramo instancu loggerFactory koja belezi dogadjaje vezano za rad sa bzom. Dok metodom builder.AddConsole() - dajemo informacije da cemo prikazivati infomracije na konzoli. :
+
+```csharp
+using CarGarageParking.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace CarGarageParking
+{
+    public class CarGarageParkingDBContext : DbContext
+    {
+        public static readonly ILoggerFactory loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
+
+        public CarGarageParkingDBContext(DbContextOptions<CarGarageParkingDBContext> options) : base(options) { }
+
+        public DbSet<Application> Applications { get; set; }
+
+        public DbSet<Garage> Garages    { get; set; }
+
+        public DbSet<Owner> Owners { get; set; }
+
+        public DbSet<Payment> Payments  { get; set; }
+
+        public DbSet<Vehicle> Vehicles { get; set; }
+
+        public DbSet<VehicleInGarage> VehicleInGarages { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Garage>()
+                 .HasMany(g => g.VehicleInGarage)
+                 .WithOne(vg => vg.Garage)
+                 .HasForeignKey(vg => vg.GarageId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Owner>()
+                .HasMany(o => o.Vehicles)
+                .WithOne(v => v.Owner )
+                .HasForeignKey(v => v.OwnerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Application>()
+                .Property(a => a.Credit)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.TotalCharge)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+               .Property(p => p.VehicleHourlyRate)
+               .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VehicleInGarage>()
+              .Property(vg => vg.HourlyRate)
+              .HasPrecision(18, 2);
+
+        }
+
+    }
+}
+```
+
+- 3 - Registracija na `Program.cs`
+ - EnableSensitiveDataLogging() – ova metoda omogucava da vidimo osetljive podatke , dok LogTo(Console.WriteLine, LogLevel.Information) – ovaj metod nam omogucama da vidimo ppodatke na konsoli, i to nivo information.
+
+  ```csharp
+  using CarGarageParking;
+using CarGarageParking.Services;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<CarGarageParkingDBContext>(options =>
+   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+   .EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Information));
+
+builder.Services.AddScoped<IOwnerService, OwnerService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+```
