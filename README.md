@@ -782,3 +782,151 @@ app.Run();
 ```
 
         
+### 6)  Kreiranje Servisnog sloja koristeci Service (folder) i interfejse 
+Servisni sloj nam omgucava da "presecemo" vezu M-V-C tj M-C-V  gde ustvari svaki upit sa baze se preko konotrlela salje na odgovoarajuci View, ubacujuci servisni sloj, spustamo Model dole sa DBconktexto, cime dovodimo 
+do lakse ogranizacije koda, do vece modularnosti i kasnije mozemo da menjamo u budcnosti bazu bez da uticemo na ostatak aplikacije i takodje prilikom koriscenja testiranja, bice nam pretraga i testiranje olaksano i dosta ubrzano, zbog kolicine 
+
+- 1 - Kreiramo folder Service  radi lakse orgranizacije podataka
+  
+- 2 - Kreiramo interfejs `IOwnerService` - koji predstavlja osnovne CRUD operacije - kreiranje, citanje, azuriranje i brisanje i dodatna metoda ako nam je neophodna 
+
+  ```csharp
+  using CarGarageParking.Models;
+
+namespace CarGarageParking.Services
+{
+    public interface IOwnerService
+    {
+        IEnumerable<Owner> GetAllOwners();
+
+        IEnumerable<Owner> GetAllOwnersWithVehicles();
+
+        Owner GetOwnerById(int id);
+
+        void CreateOwner(Owner owner);
+
+        void UpdateOwner(Owner owner);
+
+        void DeleteOwner(int id);
+    }
+}
+```
+- 3 - Kreiramo klasu `OwnerService` koja implementa interfejs `IOwnerService` - dakle ona je zaduzena da nam da kod tj implementira ponasanje ovih metoda, posto je sama klasa zavisi od instance dbcontexta zato je i pozivamo u okvriu konstruktora
+  i onda shodno metodama pozivamo metode koje Db kontext sadrzi, tako npf ono sto smo koristili lambda izraz FirstOrDefault ili vec single ovde mozemo da koristimo metodu Find() - za pronalazenje vrednosti preko id, itd.. 
+
+  ```csharp
+using CarGarageParking.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace CarGarageParking.Services
+{
+    public class OwnerService : IOwnerService
+    {
+        private readonly CarGarageParkingDBContext _context;
+
+        public OwnerService(CarGarageParkingDBContext context)
+        {
+            _context = context;
+        }
+
+
+        public void CreateOwner(Owner owner)
+        {
+            _context.Owners.Add(owner);
+            
+        }
+
+        public void DeleteOwner(int id)
+        {
+           Owner owner = _context.Owners.Find(id);
+
+            if(owner != null)
+            {
+                _context.Owners.Remove(owner);
+                 
+            }
+        }
+
+        public IEnumerable<Owner> GetAllOwners()
+        {
+            return _context.Owners.ToList();
+        }
+
+        public IEnumerable<Owner> GetAllOwnersWithVehicles()
+        {
+            return _context.Owners.Include(o => o.Vehicles).ToList();
+        }
+
+        public Owner GetOwnerById(int id)
+        {
+            return _context.Owners.Find(id);
+        }
+
+        public void UpdateOwner(Owner owner)
+        {
+            _context.Owners.Update(owner);
+            
+        }
+    }
+}
+```
+
+- 4 - prevezujemo sada `OwnerController` tako da sada prihvata umesto `dbcontexta` privhata nas IOwnerServise
+  ```csharp
+  using CarGarageParking.Models;
+using CarGarageParking.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
+
+namespace CarGarageParking.Controllers
+{
+    public class OwnerController : Controller
+    {
+             
+
+        private readonly IOwnerSerice _ownerService;
+           
+
+        public OwnerController(IOwnerSerice ownerService)
+        {
+            _ownerService = ownerService;
+        }
+
+        public IActionResult Index(string firstName, string lastName, int? numberOfCars)
+        {
+
+            var owners =  _ownerService.GetAllOwnersWithVehicles();
+                 
+
+            if (firstName !=null)
+            {
+                owners = owners.Where(o => o.FirstName.ToLower() == firstName.Trim().ToLower());
+            }
+
+            if(lastName !=null)
+            {
+                owners = owners.Where(o => o.LastName.ToLower() == lastName.Trim().ToLower());
+            }
+
+            if(numberOfCars.HasValue)
+            {
+                owners = owners.Where(o => o.Vehicles.Count() == numberOfCars);
+            }
+
+            return View(owners);
+        }
+
+        public IActionResult Info(int id)
+        {
+           Owner singleOwner =  _ownerService.GetOwnerById(id);            
+           singleOwner.Vehicles = _vehicleService.GetVehicleByCondition(v => v.OwnerId == id).ToList();      
+
+
+            return View(singleOwner);
+        }
+
+        
+    }
+}
+```
