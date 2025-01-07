@@ -5,6 +5,11 @@ namespace CarGarageParking
 {
     public class CarGarageParkingDBContext : DbContext
     {
+        public static readonly ILoggerFactory loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
+
         public CarGarageParkingDBContext(DbContextOptions<CarGarageParkingDBContext> options) : base(options) { }
 
         public DbSet<Application> Applications { get; set; }
@@ -48,10 +53,6 @@ namespace CarGarageParking
             modelBuilder.Entity<VehicleInGarage>()
               .Property(vg => vg.HourlyRate)
               .HasPrecision(18, 2);
-
-
-
-
 
         }
 
