@@ -8,24 +8,20 @@ namespace CarGarageParking.Controllers
 {
     public class OwnerController : Controller
     {
+             
 
-        private readonly IOwnerService _ownerService;
+        private readonly IUnitOfWork _unitOfWork;
+           
 
-        private readonly IVehicleService _vehicleService;
-
-      
-
-        public OwnerController(IOwnerService ownerService, IVehicleService vehicleService)
+        public OwnerController(IUnitOfWork unitOfWork)
         {
-            _ownerService = ownerService;
-            _vehicleService = vehicleService;
-
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index(string firstName, string lastName, int? numberOfCars)
         {
 
-            var owners = _ownerService.GetAllOwnersWithVehicles();
+            var owners =  _unitOfWork.OwnerService.GetAllOwnersWithVehicles();
                  
 
             if (firstName !=null)
@@ -48,8 +44,8 @@ namespace CarGarageParking.Controllers
 
         public IActionResult Info(int id)
         {
-           Owner singleOwner = _ownerService.GetOwnerById(id);            
-           singleOwner.Vehicles = _vehicleService.GetVehicleByCondition(v => v.OwnerId == id).ToList();      
+           Owner singleOwner =  _unitOfWork.OwnerService.GetOwnerById(id);            
+           singleOwner.Vehicles = _unitOfWork.VehicleService.GetVehicleByCondition(v => v.OwnerId == id).ToList();      
 
 
             return View(singleOwner);

@@ -16,7 +16,7 @@ namespace CarGarageParking.Services
         public void CreateOwner(Owner owner)
         {
             _context.Owners.Add(owner);
-            _context.SaveChanges();
+            
         }
 
         public void DeleteOwner(int id)
@@ -26,7 +26,7 @@ namespace CarGarageParking.Services
             if(owner != null)
             {
                 _context.Owners.Remove(owner);
-                _context.SaveChanges();   
+                 
             }
         }
 
@@ -48,7 +48,7 @@ namespace CarGarageParking.Services
         public void UpdateOwner(Owner owner)
         {
             _context.Owners.Update(owner);
-            _context.SaveChanges();
+            
         }
     }
 }

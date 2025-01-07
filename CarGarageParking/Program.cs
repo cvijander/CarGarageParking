@@ -12,6 +12,8 @@ builder.Services.AddDbContext<CarGarageParkingDBContext>(options =>
 builder.Services.AddScoped<IOwnerService, OwnerService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -15,7 +15,7 @@ namespace CarGarageParking.Services
         public void CreateVehicle(Vehicle vehicle)
         {
             _context.Vehicles.Add(vehicle);
-            _context.SaveChanges();
+            
         }
 
         public void DeleteVehicle(int id)
@@ -25,7 +25,7 @@ namespace CarGarageParking.Services
             if(vehicle != null)
             {
                 _context.Vehicles.Remove(vehicle);
-                _context.SaveChanges();
+                
             }
         }
 
@@ -47,7 +47,7 @@ namespace CarGarageParking.Services
         public void UpdateVehicle(Vehicle vehicle)
         {
             _context.Vehicles.Update(vehicle);
-            _context.SaveChanges();
+            
         }
 
         
