@@ -678,5 +678,107 @@ takodje proveravamo da li je iznos novca koji treba platiti jednak ili vec manji
         }
 ```
 
+- 3  - Kreiranje klase CarGarageParkingDBContext.cs - koja je spona sa bazom podataka i koristeci DBSetove pravimo tabele u bazi, dok koristeci modelBuilder dodajemo  dodatna ogranicenja
+
+```csharp
+using CarGarageParking.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace CarGarageParking
+{
+    public class CarGarageParkingDBContext : DbContext
+    {
+        public CarGarageParkingDBContext(DbContextOptions<CarGarageParkingDBContext> options) : base(options) { }
+
+        public DbSet<Application> Applications { get; set; }
+
+        public DbSet<Garage> Garages    { get; set; }
+
+        public DbSet<Owner> Owners { get; set; }
+
+        public DbSet<Payment> Payments  { get; set; }
+
+        public DbSet<Vehicle> Vehicles { get; set; }
+
+        public DbSet<VehicleInGarage> VehicleInGarages { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Garage>()
+                 .HasMany(g => g.VehicleInGarage)
+                 .WithOne(vg => vg.Garage)
+                 .HasForeignKey(vg => vg.GarageId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Owner>()
+                .HasMany(o => o.Vehicles)
+                .WithOne(v => v.Owner )
+                .HasForeignKey(v => v.OwnerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Application>()
+                .Property(a => a.Credit)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .Property(p => p.TotalCharge)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+               .Property(p => p.VehicleHourlyRate)
+               .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VehicleInGarage>()
+              .Property(vg => vg.HourlyRate)
+              .HasPrecision(18, 2);
+
+        }
+
+    }
+}
+```
+
+- 4 - Povezivanje u okviru buidera dodajemo servise koji sadrzi konekcioni string
+
+```csharp
+  using CarGarageParking;
+using CarGarageParking.Services;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<CarGarageParkingDBContext>(options =>
+   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IOwnerService, OwnerService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+```
 
         
