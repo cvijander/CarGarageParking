@@ -653,3 +653,29 @@ public class Payment :IValidatableObject
 
 Dodajemo IvalidateObject za proveru placanja cime mozemo da proverimo da li je placeno, da li je vreme napustanja garaze manje od 15 minuta u odnosu va vreme placanja, ako jeste onda je novi krug se pocinje, 
 takodje proveravamo da li je iznos novca koji treba platiti jednak ili vec manji od totalCharge 
+
+
+### 5)  Povezivanje sa Entity frajmworkom 
+ - 1 - instalacija preko nuget managera sledecih paketa
+     - Microsoft.EntityFrameworkCore.Entity
+     - Microsoft.EntityFrameworkCore.SqlServer
+     - Microsoft.EntityFrameworkCore.Tools
+
+    - 2 - Dodavanje konekcionog stringa u     appsettings.json
+              ```charp
+         {
+          "Logging": {
+            "LogLevel": {
+              "Default": "Information",
+              "Microsoft.AspNetCore": "Warning"
+            }
+          },
+          "ConnectionStrings": {
+            "DefaultConnection": "Server=DESKTOP-FEP7AFG\\SQLEXPRESS;Database=CarGarageDb;Trusted_Connection=True;MultipleActiveResultSets=True;Encrypt=False;"
+          },
+          "AllowedHosts": "*"
+        }
+```
+
+
+        
