@@ -872,12 +872,14 @@ namespace CarGarageParking.Services
 ```
 
 - 4 - prevezujemo sada `OwnerController` tako da sada prihvata umesto `dbcontexta` privhata nas IOwnerServise
-  ```csharp
-  using CarGarageParking.Models;
-using CarGarageParking.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
+
+
+```csharp
+      using CarGarageParking.Models;
+    using CarGarageParking.Services;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using System.Security.Cryptography.X509Certificates;
 
 namespace CarGarageParking.Controllers
 {
@@ -925,7 +927,6 @@ namespace CarGarageParking.Controllers
 
             return View(singleOwner);
         }
-
         
     }
 }
