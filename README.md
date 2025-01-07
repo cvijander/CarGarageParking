@@ -1134,3 +1134,5 @@ namespace CarGarageParking.Controllers
     }
 }
 ```
+
+### 8)  Dodavanje logera za proveru gresaka   
