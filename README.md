@@ -1022,5 +1022,115 @@ namespace CarGarageParking.Services
 }
 ```
 
+### 7)  Dodavanje I Unit of Work  (Patterna ) u servisni sloj  koristeci Service (folder)  
 
+   Koriscenjem IUnitOfWork -a dobijemo nekoliko prednosti tj upravljamo nad servisnim slojem, koristimo transakciju (dakle ako su svi ispostovani uslovi onda se snima promena, ako nesto nije , onda se resetuje ),
+   centralizujemo upravljanje nad svim ostalime servisima  i lako testiranje  i bolja modularnost koda 
+- 1 - kreiranje
+   
+ `IUnitOfWork`
+
+ ```csharp
+namespace CarGarageParking.Services
+{
+    public interface IUnitOfWork
+    {
+        void SaveChanges();
+
+        IOwnerService OwnerService { get; }
+
+        IVehicleService VehicleService { get; }
+    }
+}
+```
+- 2 Kreiramo `UnitOfWork`   implementira `IUnitOfWork` ali neophodno je preko konstruktora proslediti dbcontext i napraviti nove instance propertija servica koji nam se nalaze u okviru `IUnitOfWork` i sada je deo za snimanje tj Save changes prebacen da o tom brine `UnitOfWork`
   
+```csharp
+namespace CarGarageParking.Services
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly CarGarageParkingDBContext _context;
+
+        public UnitOfWork(CarGarageParkingDBContext context)
+        {
+            _context = context;
+
+            OwnerService = new OwnerService(context);
+
+            VehicleService = new VehicleService(context);
+
+        }
+
+        public IOwnerService OwnerService { get; private set; }
+
+        public IVehicleService VehicleService { get; private set; }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+```
+
+- 3 Promena u konstruktoru `OwnerController`
+  
+```csharp
+using CarGarageParking.Models;
+using CarGarageParking.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
+
+namespace CarGarageParking.Controllers
+{
+    public class OwnerController : Controller
+    {
+             
+
+        private readonly IUnitOfWork _unitOfWork;
+           
+
+        public OwnerController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public IActionResult Index(string firstName, string lastName, int? numberOfCars)
+        {
+
+            var owners =  _unitOfWork.OwnerService.GetAllOwnersWithVehicles();
+                 
+
+            if (firstName !=null)
+            {
+                owners = owners.Where(o => o.FirstName.ToLower() == firstName.Trim().ToLower());
+            }
+
+            if(lastName !=null)
+            {
+                owners = owners.Where(o => o.LastName.ToLower() == lastName.Trim().ToLower());
+            }
+
+            if(numberOfCars.HasValue)
+            {
+                owners = owners.Where(o => o.Vehicles.Count() == numberOfCars);
+            }
+
+            return View(owners);
+        }
+
+        public IActionResult Info(int id)
+        {
+           Owner singleOwner =  _unitOfWork.OwnerService.GetOwnerById(id);            
+           singleOwner.Vehicles = _unitOfWork.VehicleService.GetVehicleByCondition(v => v.OwnerId == id).ToList();      
+
+
+            return View(singleOwner);
+        }
+
+        
+    }
+}
+```
