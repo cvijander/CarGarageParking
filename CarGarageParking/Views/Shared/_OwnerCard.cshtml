@@ -6,15 +6,37 @@
 @model CarGarageParking.Models.Owner
 
 
-<div class="own">
-   <h2>First name: @Model.FirstName</h2>
-   <h2>Last name @Model.LastName</h2>
+<div class="owner-card-look">
+    <h2>Name: @Model.FirstName</h2>
+    <h3>Lastname: @Model.LastName</h3>
+    <p>Number of cars: @Model.Vehicles.Count()</p>    
+    <a href="@Url.Action("Info","Owner", new {id = Model.OwnerId})">View more info about cars</a>
 </div>
 
 
 <style>
-    .own{
-        background-color:beige;
-        border: 1px solid black;
-    }
+    .owner-card-look
+       {
+       border:1px solid gray;
+       border-radius: 15px;
+           margin:10px;
+           padding: 15px;
+           background-color: cadetblue;
+           color: white;
+       }
+
+       .owner-card-look a {
+           color: yellow;
+           text-align:center;
+           text-decoration:none;
+           text-transform:uppercase;
+       }
+
+       .owner-card-look a:hover {
+
+           color: white;
+           text-align: center;
+           text-decoration:none;
+           text-transform: lowercase;
+       }
 </style>

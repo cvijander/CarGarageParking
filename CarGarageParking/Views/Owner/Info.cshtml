@@ -11,10 +11,7 @@
 
 
     <ul class="vehicle-solo">
-        @foreach(Vehicle vehicle in Model.Vehicles)
-        {
-            <li>Vehicle: @vehicle.LicencePlate</li>
-        }
+        
         @foreach (Vehicle vehi in Model.Vehicles)
         {
             <li> @await Html.PartialAsync("_VehicleCard",vehi)</li>
