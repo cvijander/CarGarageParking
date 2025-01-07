@@ -661,8 +661,9 @@ takodje proveravamo da li je iznos novca koji treba platiti jednak ili vec manji
      - Microsoft.EntityFrameworkCore.SqlServer
      - Microsoft.EntityFrameworkCore.Tools
 
-    - 2 - Dodavanje konekcionog stringa u     appsettings.json
-              ```charp
+
+- 2  - Dodavanje konekcionog stringa u     appsettings.json
+```charp
          {
           "Logging": {
             "LogLevel": {
