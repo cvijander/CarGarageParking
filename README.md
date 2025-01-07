@@ -790,7 +790,9 @@ do lakse ogranizacije koda, do vece modularnosti i kasnije mozemo da menjamo u b
   
 - 2 - Kreiramo interfejs `IOwnerService` - koji predstavlja osnovne CRUD operacije - kreiranje, citanje, azuriranje i brisanje i dodatna metoda ako nam je neophodna 
 
-  ```csharp
+`IOwnerService`
+
+```csharp
   using CarGarageParking.Models;
 
 namespace CarGarageParking.Services
@@ -814,7 +816,9 @@ namespace CarGarageParking.Services
 - 3 - Kreiramo klasu `OwnerService` koja implementa interfejs `IOwnerService` - dakle ona je zaduzena da nam da kod tj implementira ponasanje ovih metoda, posto je sama klasa zavisi od instance dbcontexta zato je i pozivamo u okvriu konstruktora
   i onda shodno metodama pozivamo metode koje Db kontext sadrzi, tako npf ono sto smo koristili lambda izraz FirstOrDefault ili vec single ovde mozemo da koristimo metodu Find() - za pronalazenje vrednosti preko id, itd.. 
 
-  ```csharp
+`OwnerService`
+
+```csharp
 using CarGarageParking.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -873,6 +877,7 @@ namespace CarGarageParking.Services
 
 - 4 - prevezujemo sada `OwnerController` tako da sada prihvata umesto `dbcontexta` privhata nas `IOwnerServise`
 
+`OwnerController`
 
 ```csharp
       using CarGarageParking.Models;
