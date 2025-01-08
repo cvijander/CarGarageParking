@@ -1272,9 +1272,9 @@ app.Run();
 
 ### 9)  Kreiranje CRUD operacija za Garage 
 
-- 1
-  `IGarageService`
-  ```csharp
+- 1   `IGarageService`
+
+```csharp
   using CarGarageParking.Models;
 using System.Diagnostics.Metrics;
 
@@ -1297,7 +1297,7 @@ namespace CarGarageParking.Services
 }
 ```
 
- - 2 `GarageService`
+ - 2  `GarageService`
 
 ```csharp
 using CarGarageParking.Models;
@@ -1347,9 +1347,9 @@ namespace CarGarageParking.Services
 }
 ```
 
- - 3 - `UnitOfWork` - dodat GarageService
+ - 3 -  `UnitOfWork` - dodat GarageService
 
-   ```csharp
+```csharp
    namespace CarGarageParking.Services
 {
     public class UnitOfWork : IUnitOfWork
