@@ -3,16 +3,19 @@
 *@
 @{
 }
-@model CarGarageParking.Models.Garage;
+@model CarGarageParking.Models.Garage
 
 @{
-    ViewData["Title"] = $"{Model.Name}{ Model.Location}";
+    ViewData["Title"] = "Delete a garage";
 }
+
+<h1>Delete a garage</h1>
 
 <h2>@Model.Name @Model.Location</h2>
 
 <div>
     <ul>
+
         <li>Garazni broj: @Model.GarageId</li>
         <li>Naziv: @Model.Name</li>
         <li>Lokacija: @Model.Location</li>
@@ -24,11 +27,18 @@
         }
 
         <li>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</li>
-        <li>Da li je garaza puna? @(Model.IsFull ? "Jeste" : "Nije")</li>                
+        <li>Da li je garaza puna? @(Model.IsFull ? "Jeste" : "Nije")</li>
     </ul>
 </div>
 
+<form asp-action="DeleteConfirmed" asp-controller="Garage" method="post">
+    <input type="hidden" name="id" value="@Model.GarageId" />
 
-<a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Back to all garages</a>
-<a href="@Url.Action("Edit","Garage", new {id = Model.GarageId })" class="btn btn-secondary">Edit a garage</a>
-<a href="@Url.Action("Delete","Garage",new {id = Model.GarageId})" class="btn btn-danger">Delete</a>
+    <button type="submit"  class="btn btn-danger">Delete</button>
+    
+    <a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Cancel and back to garages</a>
+</form>
+
+
+
+

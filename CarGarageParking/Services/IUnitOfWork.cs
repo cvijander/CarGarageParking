@@ -7,5 +7,7 @@
         IOwnerService OwnerService { get; }
 
         IVehicleService VehicleService { get; }
+
+        IGarageService GarageService { get; }
     }
 }

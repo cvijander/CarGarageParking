@@ -1,0 +1,52 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CarGarageParking.Models.Garage
+
+@{
+    ViewData["Title"] = "Create a garage";
+}
+
+<h1>Create a garage</h1>
+
+<form asp-action="Create" asp-controller="Garage" method="post">
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input type="text" asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Location" class="form-label"></label>
+        <input type="text" asp-for="Location" class="form-control" required />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Capacity" class="form-label"></label>
+        <input type="number" asp-for="Capacity" class="form-control"  min="1" step="1" />
+        <span asp-validation-for="Capacity" class="text-danger"></span>
+    </div>    
+
+    <div class="form-group">
+        <label asp-for="CurrentOccupancy" class="form-label"></label>
+        <input type="number" asp-for="CurrentOccupancy" class="form-control" min="0" step="1"  />
+        <span asp-validation-for="CurrentOccupancy" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create a garage</button>
+    <a href="@Url.Action("Index","Garage")" class="btn btn-secondary" >Cancel</a>
+
+</form>
+
+
+
+
+ 
+
+       
+

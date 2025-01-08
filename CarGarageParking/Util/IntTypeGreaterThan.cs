@@ -34,7 +34,7 @@ namespace CarGarageParking.Util
                     return ValidationResult.Success;
                 }
 
-                if (value != null && comparisonValue != null && currentValue < comparisonValue)
+                if (value != null && comparisonValue != null && currentValue > comparisonValue)
                 {
                     return new ValidationResult(ErrorMessage ?? $"{validationContext.DisplayName} must be greater then {_comparisonProperty}");
                 }

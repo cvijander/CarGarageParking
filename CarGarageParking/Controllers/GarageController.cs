@@ -1,13 +1,23 @@
 ﻿using CarGarageParking.Models;
+using CarGarageParking.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarGarageParking.Controllers
 {
     public class GarageController : Controller
     {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GarageController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
         public IActionResult Index(string name, string location, int? maxCapacity, int? availableSpots, decimal? percent)
         {
-            IEnumerable<Garage> garages = ShowAllGarages();
+            
+            var garages = _unitOfWork.GarageService.GetAllGarages();
+
 
             if(name !=null)
             {
@@ -35,33 +45,95 @@ namespace CarGarageParking.Controllers
 
         public IActionResult Info(int id)
         {
-            IEnumerable<Garage> garages = ShowAllGarages();
-            Garage garage = garages.FirstOrDefault(g => g.GarageId == id);
+           Garage garage = _unitOfWork.GarageService.GetGarageById(id);
 
             return View(garage);
         }
 
-        private IEnumerable<Garage> ShowAllGarages()
+        [HttpGet]
+        public IActionResult Create()
         {
-            List<Garage> listOfGarages = new List<Garage>();
-            Garage g1 = new Garage();
-            g1.GarageId = 1;
-            g1.Name = "Resavska";
-            g1.Location = "Beograd";
-            g1.Capacity = 600;
-            g1.CurrentOccupancy = 450;
-            listOfGarages.Add(g1);
+            return View();
+        }
 
-            Garage g2 = new Garage();
-            g2.GarageId = 2;
-            g2.Name = "Centar";
-            g2.Location = "Novi Sad";
-            g2.Capacity = 400;
-            g2.CurrentOccupancy = 250;
-            listOfGarages.Add(g2);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Garage garage)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.GarageService.AddGarage(garage);
+                _unitOfWork.SaveChanges();
 
-            return listOfGarages;
+                return RedirectToAction("Index");
+            }
 
+            return View(garage);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            return View(garage);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Garage garage)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.GarageService.Update(garage);
+                _unitOfWork.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(garage);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            return View(garage);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            if(id == 0)
+            {
+                return BadRequest("Invalid garage id");
+            }
+
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+             if(garage == null)
+            {
+                return NotFound();
+            }
+
+            _unitOfWork.GarageService.Delete(id);
+            _unitOfWork.SaveChanges();
+
+            
+
+            return RedirectToAction(nameof(Index));
         }
        
     }
