@@ -1269,3 +1269,532 @@ app.MapControllerRoute(
 
 app.Run();
 ```
+
+### 9)  Kreiranje CRUD operacija za Garage 
+
+- 1
+  `IGarageService`
+  ```csharp
+  using CarGarageParking.Models;
+using System.Diagnostics.Metrics;
+
+namespace CarGarageParking.Services
+{
+    public interface IGarageService
+    {
+        IEnumerable<Garage> GetAllGarages();
+
+        Garage GetGarageById(int id);
+
+        void AddGarage(Garage garage);
+
+        void Update(Garage garage);
+
+        void Delete(int id);
+
+
+    }
+}
+```
+
+ - 2 `GarageService`
+
+```csharp
+using CarGarageParking.Models;
+
+namespace CarGarageParking.Services
+{
+    public class GarageService : IGarageService
+    {
+
+        private readonly CarGarageParkingDBContext _dbContext;
+
+        public GarageService(CarGarageParkingDBContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public void AddGarage(Garage garage)
+        {
+            _dbContext.Garages.Add(garage);
+            
+        }
+
+        public void Delete(int id)
+        {
+            Garage garage = _dbContext.Garages.Find(id);
+            if(garage != null)
+            {
+                _dbContext.Garages.Remove(garage);
+            }
+        }
+
+        public IEnumerable<Garage> GetAllGarages()
+        {
+            return _dbContext.Garages.ToList();
+        }
+
+        public Garage GetGarageById(int id)
+        {
+            return _dbContext.Garages.Find(id);
+        }
+
+        public void Update(Garage garage)
+        {
+            _dbContext.Garages.Update(garage);
+        }
+    }
+}
+```
+
+ - 3 - `UnitOfWork` - dodat GarageService
+
+   ```csharp
+   namespace CarGarageParking.Services
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly CarGarageParkingDBContext _context;
+
+        public UnitOfWork(CarGarageParkingDBContext context)
+        {
+            _context = context;
+
+            OwnerService = new OwnerService(context);
+
+            VehicleService = new VehicleService(context);
+
+            GarageService = new GarageService(context);
+
+        }
+
+        public IOwnerService OwnerService { get; private set; }
+
+        public IVehicleService VehicleService { get; private set; }
+
+        public IGarageService GarageService { get; private set; }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+```
+
+- 4 - `GarageControler`
+
+```csharp
+using CarGarageParking.Models;
+using CarGarageParking.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace CarGarageParking.Controllers
+{
+    public class GarageController : Controller
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GarageController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public IActionResult Index(string name, string location, int? maxCapacity, int? availableSpots, decimal? percent)
+        {
+            
+            var garages = _unitOfWork.GarageService.GetAllGarages();
+
+
+            if(name !=null)
+            {
+                garages = garages.Where(g => g.Name.ToLower() == name.Trim().ToLower());
+            }
+
+            if(location != null)
+            {
+                garages = garages.Where(g => g.Location.ToLower() == location.Trim().ToLower());
+            }
+
+            if (maxCapacity.HasValue)
+            {
+                garages = garages.Where(g => g.Capacity >= maxCapacity);
+            }
+            if (availableSpots.HasValue) 
+            {
+                garages = garages.Where(g => g.AvailableSpots >= availableSpots);   
+            }
+                        
+
+            
+            return View(garages);
+        }
+
+        public IActionResult Info(int id)
+        {
+           Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            return View(garage);
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Garage garage)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.GarageService.AddGarage(garage);
+                _unitOfWork.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(garage);
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            return View(garage);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Garage garage)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.GarageService.Update(garage);
+                _unitOfWork.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(garage);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            return View(garage);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            if(id == 0)
+            {
+                return BadRequest("Invalid garage id");
+            }
+
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+             if(garage == null)
+            {
+                return NotFound();
+            }
+
+            _unitOfWork.GarageService.Delete(id);
+            _unitOfWork.SaveChanges();
+
+            
+
+            return RedirectToAction(nameof(Index));
+        }
+       
+    }
+}
+```
+- 5 kreiranje viewa
+
+  `Index` za Garage
+
+```csharp
+@model IEnumerable<CarGarageParking.Models.Garage>
+
+    @{
+        ViewData["Title"] = "Show all garages";
+    }
+  
+ 
+    <form asp-action="Index" asp-controller="Garage" method="get">
+        <label for="name">Name:</label> 
+        <input type="text" id="name" name="name" value="@Context.Request.Query["name"]" />
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" value="@Context.Request.Query["location"]" />
+
+        <label for="maxCapacity">Capacity</label>
+        <input type="number" id="maxCapacity" name="maxCapacity" value="@Context.Request.Query["maxCapacity"]" />
+
+        <label for="availableSpots">Available spots</label>
+        <input type="number" id="availableSpots"  name="availableSpots" value="@Context.Request.Query["availableSpots"]" />
+
+          <!--   <label for="percent">Procenat popunjenosti</label>-->
+        <!--  <input type="number" id="percent" name="percent" value="@Context.Request.Query["percent"]" />-->
+        
+
+        <button type="submit" class="btn btn-primary">Submit</button>        
+        <a href="@Url.Action("Index","Garage")" class="btn btn-secondary" >Clear</a>
+    </form>
+
+
+
+    <div class="garage-list">
+        @foreach(Garage singleGarage in Model)
+    {
+        <div class="garage-solo">
+            <hr />
+            <h2>Naziv garaze: @singleGarage.Name</h2>
+            <h3>Broj slobodnih mesta: @singleGarage.AvailableSpots</h3>
+            @{
+                decimal OcupancyPercent = ((decimal)singleGarage.CurrentOccupancy / singleGarage.Capacity)*100;
+            }
+
+            <h3>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</h3>           
+            <h3>Da li je garaza puna? @(singleGarage.IsFull? "Jeste":"Nije")</h3>
+            <a href="@Url.Action("Info","Garage", new {Id = singleGarage.GarageId})">View more info</a>
+            <hr />
+        </div>
+    }
+
+    </div>
+
+
+
+
+    <style>
+
+    .garage-solo {
+        background-color: burlywood;
+        margin:15px;
+        padding-left:15px;
+    }
+        hr{
+            color:darkred;
+
+        }
+    </style>
+```
+
+`Info`
+
+```csharp
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model CarGarageParking.Models.Garage;
+
+@{
+    ViewData["Title"] = $"{Model.Name}{ Model.Location}";
+}
+
+<h2>@Model.Name @Model.Location</h2>
+
+<div>
+    <ul>
+        <li>Garazni broj: @Model.GarageId</li>
+        <li>Naziv: @Model.Name</li>
+        <li>Lokacija: @Model.Location</li>
+        <li>Kapacitet : @Model.Capacity</li>
+        <li>Broj zauzetih mesta @Model.CurrentOccupancy </li>
+        <li>Broj trenutno slobodna mesta  @Model.AvailableSpots </li>
+        @{
+            decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
+        }
+
+        <li>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</li>
+        <li>Da li je garaza puna? @(Model.IsFull ? "Jeste" : "Nije")</li>                
+    </ul>
+</div>
+
+
+<a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Back to all garages</a>
+<a href="@Url.Action("Edit","Garage", new {id = Model.GarageId })" class="btn btn-secondary">Edit a garage</a>
+<a href="@Url.Action("Delete","Garage",new {id = Model.GarageId})" class="btn btn-danger">Delete</a>
+```
+
+ `Create`
+
+ ```csharp
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CarGarageParking.Models.Garage
+
+@{
+    ViewData["Title"] = "Create a garage";
+}
+
+<h1>Create a garage</h1>
+
+<form asp-action="Create" asp-controller="Garage" method="post">
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input type="text" asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Location" class="form-label"></label>
+        <input type="text" asp-for="Location" class="form-control" required />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Capacity" class="form-label"></label>
+        <input type="number" asp-for="Capacity" class="form-control"  min="1" step="1" />
+        <span asp-validation-for="Capacity" class="text-danger"></span>
+    </div>    
+
+    <div class="form-group">
+        <label asp-for="CurrentOccupancy" class="form-label"></label>
+        <input type="number" asp-for="CurrentOccupancy" class="form-control" min="0" step="1"  />
+        <span asp-validation-for="CurrentOccupancy" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create a garage</button>
+    <a href="@Url.Action("Index","Garage")" class="btn btn-secondary" >Cancel</a>
+
+</form>
+
+```
+
+`Edit`
+
+```csharp
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model CarGarageParking.Models.Garage
+
+@{
+    ViewData["Title"] = "Edit a garage";
+}
+
+<h1>Edit a garage</h1>
+
+<form asp-action="Edit" asp-controller="Garage" method="post">
+    <input type="hidden" asp-for="GarageId" />
+
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label"></label>
+        <input type="text" asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Location" class="form-label"></label>
+        <input type="text" asp-for="Location" class="form-control" required />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Capacity" class="form-label"></label>
+        <input type="number" asp-for="Capacity" class="form-control" min="1" step="1" />
+        <span asp-validation-for="Capacity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CurrentOccupancy" class="form-label"></label>
+        <input type="number" asp-for="CurrentOccupancy" class="form-control" min="0" step="1" />
+        <span asp-validation-for="CurrentOccupancy" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save a change</button>
+    <a href="@Url.Action("Index","Garage")" class="btn btn-secondary">Cancel</a>
+
+</form>
+```
+
+`Delete`
+
+```csharp
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model CarGarageParking.Models.Garage
+
+@{
+    ViewData["Title"] = "Delete a garage";
+}
+
+<h1>Delete a garage</h1>
+
+<h2>@Model.Name @Model.Location</h2>
+
+<div>
+    <ul>
+
+        <li>Garazni broj: @Model.GarageId</li>
+        <li>Naziv: @Model.Name</li>
+        <li>Lokacija: @Model.Location</li>
+        <li>Kapacitet : @Model.Capacity</li>
+        <li>Broj zauzetih mesta @Model.CurrentOccupancy </li>
+        <li>Broj trenutno slobodna mesta  @Model.AvailableSpots </li>
+        @{
+            decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
+        }
+
+        <li>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</li>
+        <li>Da li je garaza puna? @(Model.IsFull ? "Jeste" : "Nije")</li>
+    </ul>
+</div>
+
+<form asp-action="DeleteConfirmed" asp-controller="Garage" method="post">
+    <input type="hidden" name="id" value="@Model.GarageId" />
+
+    <button type="submit"  class="btn btn-danger">Delete</button>
+    
+    <a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Cancel and back to garages</a>
+</form>
+```
+
+
+
+
+
+
+
+ 
+
+       
+
+
+
+
+  
+
