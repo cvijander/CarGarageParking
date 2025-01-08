@@ -1526,6 +1526,7 @@ namespace CarGarageParking.Controllers
     }
 }
 ```
+
 - 5 kreiranje viewa
 
   `Index` za Garage
@@ -1598,7 +1599,7 @@ namespace CarGarageParking.Controllers
     </style>
 ```
 
-`Info`
+`Info` za `Garage`
 
 ```csharp
 @*
@@ -1637,9 +1638,9 @@ namespace CarGarageParking.Controllers
 <a href="@Url.Action("Delete","Garage",new {id = Model.GarageId})" class="btn btn-danger">Delete</a>
 ```
 
- `Create`
+ `Create` za `Garage`
 
- ```csharp
+```csharp
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -1687,7 +1688,7 @@ namespace CarGarageParking.Controllers
 
 ```
 
-`Edit`
+`Edit` za `Garage`
 
 ```csharp
 @*
@@ -1738,7 +1739,7 @@ namespace CarGarageParking.Controllers
 </form>
 ```
 
-`Delete`
+`Delete` za `Garage`
 
 ```csharp
 @*
