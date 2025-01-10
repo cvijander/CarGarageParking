@@ -13,7 +13,7 @@ namespace CarGarageParking.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index(string name, string location, int? maxCapacity, int? availableSpots, decimal? percent)
+        public IActionResult Index(string name, string location, int? maxCapacity, int? availableSpots, decimal? percent, int page = 1)
         {
             
             var garages = _unitOfWork.GarageService.GetAllGarages();
@@ -37,10 +37,20 @@ namespace CarGarageParking.Controllers
             {
                 garages = garages.Where(g => g.AvailableSpots >= availableSpots);   
             }
-                        
 
+            var pageSize = 2;
+
+            PaginationViewModel pgmv = new PaginationViewModel();
+            pgmv.PageSize = pageSize;
+            pgmv.TotalCount = garages.Count();
             
-            return View(garages);
+            pgmv.CurrentPage = page;   
+
+            garages = garages.Skip( pageSize * (page -1) ).Take(pageSize);
+
+            pgmv.Garages = garages;
+
+            return View(pgmv);
         }
 
         public IActionResult Info(int id)

@@ -1,5 +1,4 @@
-﻿@model IEnumerable<CarGarageParking.Models.Garage>
-
+﻿@model CarGarageParking.Models.PaginationViewModel
     @{
         ViewData["Title"] = "Show all garages";
     }
@@ -29,7 +28,7 @@
 
 
     <div class="garage-list">
-        @foreach(Garage singleGarage in Model)
+        @foreach(Garage singleGarage in Model.Garages)
     {
         <div class="garage-solo">
             <hr />
@@ -47,6 +46,37 @@
     }
 
     </div>
+     
+
+ @if(Model.HasPrevious)
+{
+    <a href="@Url.Action("Index","Garage", new { page = (Model.CurrentPage-1).ToString() })" class="btn btn-primary">Previous |</a>
+}
+
+@if(Model.HasNext)
+{
+    <a href="@Url.Action("Index","Garage", new { page = (Model.CurrentPage)+1 })" class="btn btn-secondary">| Next</a>
+}
+
+    
+    <hr />
+
+@for(int i = 1; i <= Model.TotalPages; i++)
+{
+    if(Model.CurrentPage == i)
+    {
+        <a href="@Url.Action("Index","Garage", new {page = i})" class="btn disabled">@i</a>
+    }
+    else
+    {
+        <a href="@Url.Action("Index","Garage", new {page = i})" class="btn btn-warning">@i</a>
+    }
+
+       
+}
+
+
+   
 
 
 
