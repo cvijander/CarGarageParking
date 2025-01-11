@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Find a garage";
+}
+
+<h1>Find a specific or local garage</h1>
+
+<form asp-action="SearchAGarage" asp-controller="Home" method="get" class="form-search">
+    <div class="form-group">
+        <label for="search" class="form-label">Enter a garage name or location</label>
+        <input type="text" id="search" name="search" required class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Search</button>
+    <a href="@Url.Action("Index","Home")" class="btn btn-secondary">Cancel</a>
+</form>
+
+<style>
+    .form-search {
+        margin: 150px auto;
+        border: 1px solid gray;
+        border-radius: 55px;
+    }
+
+    .form-group{
+        width: 600px;
+        margin:15px auto;
+        position:center;
+        display: flex;
+    }
+
+    .btn {
+        padding: 15px 25px;
+        font-size: larger;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;       
+        text-decoration: none;
+        color: white;
+        border: 1px solid gray;
+        width: 250px;
+        margin: 15px auto;       
+        flex-direction:row;        
+        justify-content:space-between;
+    }
+</style>

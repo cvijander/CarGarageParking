@@ -1,8 +1,8 @@
-﻿namespace CarGarageParking.Models
+﻿namespace CarGarageParking.ViewModel
 {
-    public class PaginationViewModel
+    public class PaginationViewModel<T> :IPaginationViewModel where T : class
     {
-        public IEnumerable<Garage> Garages { get; set; }
+        public IEnumerable<T> Collection { get; set; }
 
         public int PageSize { get; set; }
 
@@ -16,25 +16,25 @@
                 {
                     totalP++;
                 }
-                    return totalP;
-                
+                return totalP;
+
             }
-                
+
         }
 
-    public int CurrentPage { get; set; }
+        public int CurrentPage { get; set; }
 
-     public bool HasPrevious
+        public bool HasPrevious
         {
             get
             {
                 return CurrentPage > 1;
-                
+
             }
         }
-        
 
-      public bool HasNext 
+
+        public bool HasNext
         {
             get
             {
@@ -42,6 +42,6 @@
 
             }
         }
-          
+
     }
 }

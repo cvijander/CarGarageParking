@@ -9,5 +9,7 @@
         IVehicleService VehicleService { get; }
 
         IGarageService GarageService { get; }
+
+        IVehicleInGarageService VehicleInGarageService { get; set; }
     }
 }
