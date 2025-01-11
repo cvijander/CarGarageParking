@@ -1792,7 +1792,7 @@ namespace CarGarageParking.Controllers
 
    `IPaginationViewModel`
 
-   ```csharp
+```csharp
    namespace CarGarageParking.ViewModel
 {
     public interface IPaginationViewModel
@@ -1864,7 +1864,7 @@ namespace CarGarageParking.ViewModel
 
   `_PaginationView`  i sada se ovaj model importuje upravo IPagination - koji obezbedjuje da moramo da imamo definisano ona 4 propertija od malo pre, hasPrevious, hasNext, CurrentPage i TotalPages 
 
-  ```csharp
+```csharp
   @model CarGarageParking.ViewModel.IPaginationViewModel
 
     <nav class="Page-navigation">
