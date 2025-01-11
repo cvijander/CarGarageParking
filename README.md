@@ -1784,6 +1784,128 @@ namespace CarGarageParking.Controllers
 </form>
 ```
 
+### 10)  Kreiranje genericke  Paginacije koja bi mogla da se koristi na vise mesta, `Garage`, `Vehicle`, `VehicleInGarage`, `Owner`
+
+ - 1 - Kreiranja foldera tj izmestanje postojeceg fajla paginacije na  svoj `ViewModel` folder cime ostaje sadrzaj `Modela` da sadrzi samo ono sto je deklarisano na pocetku
+
+ - 2 - Pravljenje `IPaginationViewModel` interfejsa koji predstavlja ugovor i koji obezbedjuje minimalno informacija koje moramo da imamo da bi ih preneli na view nase stranice koju budemo pozivali 
+
+   `IPaginationViewModel`
+
+   ```csharp
+   namespace CarGarageParking.ViewModel
+{
+    public interface IPaginationViewModel
+    {
+        
+        public int TotalPages { get; }
+
+        public int CurrentPage { get; set; }
+
+        public bool HasPrevious { get; }    
+        public bool HasNext { get;}
+    }
+}
+```
+
+- 3 - Implementacija interfejsa kroz klasu `PaginationViewModel`
+
+```csharp
+namespace CarGarageParking.ViewModel
+{
+    public class PaginationViewModel<T> :IPaginationViewModel where T : class
+    {
+        public IEnumerable<T> Collection { get; set; }
+
+        public int PageSize { get; set; }
+
+        public int TotalCount { get; set; }
+        public int TotalPages
+        {
+            get
+            {
+                int totalP = TotalCount / PageSize;
+                if (TotalCount % PageSize != 0)
+                {
+                    totalP++;
+                }
+                return totalP;
+
+            }
+
+        }
+
+        public int CurrentPage { get; set; }
+
+        public bool HasPrevious
+        {
+            get
+            {
+                return CurrentPage > 1;
+
+            }
+        }
+
+
+        public bool HasNext
+        {
+            get
+            {
+                return CurrentPage < TotalPages;
+
+            }
+        }
+
+    }
+}
+```
+
+- 4 - U okviru `shared` foldera pravimo novi `view` sa naslovom `_PaginationView` i u njega prebacujemo sadrzaj koji je pre toga bio definisan u okviru `Index` za `Garage` . samo izuzimajuci postojece definisane kontrolere,kako bi bio pogled univerzalan
+
+  `_PaginationView`  i sada se ovaj model importuje upravo IPagination - koji obezbedjuje da moramo da imamo definisano ona 4 propertija od malo pre, hasPrevious, hasNext, CurrentPage i TotalPages 
+
+  ```csharp
+  @model CarGarageParking.ViewModel.IPaginationViewModel
+
+    <nav class="Page-navigation">
+
+    @if (Model.HasPrevious)
+    {
+        <a href="@Url.Action("Index", new { page = (Model.CurrentPage-1).ToString() })" class="btn btn-primary">Previous |</a>
+    }
+
+    @if (Model.HasNext)
+    {
+        <a href="@Url.Action("Index", new { page = (Model.CurrentPage)+1 })" class="btn btn-secondary">| Next</a>
+    }
+
+
+    <hr />
+
+    @for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        if (Model.CurrentPage == i)
+        {
+            <a href="@Url.Action("Index", new {page = i})" class="btn disabled">@i</a>
+        }
+        else
+        {
+            <a href="@Url.Action("Index", new {page = i})" class="btn btn-warning">@i</a>
+        }
+
+
+    }
+    </nav>
+
+
+<style>
+    nav {
+        background-color: aquamarine;
+
+        
+    }
+</style>
+```
 
 
 
