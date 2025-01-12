@@ -2371,7 +2371,7 @@ dok view izgleda
 ```
 
 Nakon toga korisnik bira iz liste ponudjeh garaza ,zeljenu garazu 
-![Chose a garage](CarParkingGarage/docs/images/SearchAGarage-Home.jpg)
+![Chose a garage](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
        
 
 
