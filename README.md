@@ -2374,8 +2374,179 @@ Nakon toga korisnik bira iz liste ponudjeh garaza ,zeljenu garazu
 ![Chose a garage](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
        
 
+Klikom na garazu dobija slecedu stranicu 
 
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-Intro.jpg)
 
+`EnterVehilceDetails`  `Home` contkotrler 
 
+```csharp
+
+        [HttpGet]
+        public IActionResult EnterVehicleDetails(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            EnterVehicleModel evm = new EnterVehicleModel();
+
+            evm.GarageId = garage.GarageId;
+            evm.GarageName = garage.Name;
+            evm.GarageLocation = garage.Location;          
+            
+
+            return View(evm);
+        }
+```
+
+`EnterVehicleDetails`  view 
+
+```csharp
+@model CarGarageParking.ViewModel.EnterVehicleModel
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/EntertVehicleDetails.css" />
+</head>
+@{
+    ViewData["Title"] = "Enter a vehicle";
+}
+
+<h1>Enter vehicle details</h1>
+
+<div class="garage-info">
+    <h2><strong>Garage name:</strong> @Model.GarageName</h2>
+    <h3><strong>Garage Location: </strong> @Model.GarageLocation</h3>
+</div>
+
+<form asp-action="ConfirmVehicleEntry" asp-controller="Home" method="post">
+    <input type="hidden" name="GarageId" value="@Model.GarageId" />
+
+    <div class="form-group">
+        <label asp-for="LicencePlate">enter a licence plate</label>
+        <input type="text" asp-for="LicencePlate" class="form-control" required  maxlength="15" />
+        <span asp-validation-for="LicencePlate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="reset" class="btn btn-primary">Reset</button>
+    <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
+</form>
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+        Step 3 of 4
+    </div>
+</div>
+
+<style>
   
 
+    
+    
+</style>
+
+<script>
+    function Time() {
+        var now = new Date();
+        document.getElementbyId("currentTime").innerText = now.toLocaleTimeString();
+    }
+    setInterval(Time, 1000);
+    Time();
+
+</script>
+```
+
+Dakle ovde koristnik zavisno od odabir garaze koji sustvaro dobijamo shodno get prosledjivanju vrednosti id od garaze. Nalazimo garazu, pravimo novi model koji sadzri podatke o garazi i podake za tablicu ,i prosledjujemo ga na view 
+
+Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gresku, dok ako nije, dobija poruku da je vozilo uspesno uslo u garazu i u tom vremenu 
+
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-AlreadyInGarage.jpg)
+
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-SuccesfulIntro.jpg)
+
+
+
+  i http zahtev koji je zaduzen za snimanje 
+
+  `ConfirmVehicleEntry` akcija za potvrdu snimanja 
+
+```csharp
+ [HttpPost]
+ public IActionResult ConfirmVehicleEntry(int garageId, string licencePlate)
+ {
+     var existingVehicle = _unitOfWork.VehicleInGarageService.GetAllVehicleInGarage().FirstOrDefault(v => v.Vehicle != null && v.Vehicle.LicencePlate == licencePlate && v.IsVehicleStillInGarage);
+
+     if(existingVehicle != null)
+     {
+         ViewBag.ErrorMessage = "Vehicle is already in garege";
+
+         var garages = _unitOfWork.GarageService.GetAllGarages();
+         var pageSize = 2;
+         var pgvm = new PaginationViewModel<Garage>
+         {
+             TotalCount = garages.Count(),
+             CurrentPage = 1,
+             PageSize = pageSize,
+             Collection = garages.Take(pageSize)
+         };
+
+         return View("GarageResult", pgvm);
+         
+     }
+
+     Garage garage = _unitOfWork.GarageService.GetGarageById(garageId);
+     if(garage == null || garage.IsFull)
+     {
+         ViewBag.ErrorMessage = "Garage is full or not found";
+         var garages = _unitOfWork.GarageService.GetAllGarages();
+         var pageSize = 2;
+         var pgvm = new PaginationViewModel<Garage>
+         {
+             TotalCount = garages.Count(),
+             CurrentPage = 1, 
+             PageSize = pageSize,
+             Collection = garages.Take(pageSize)
+         };
+
+         return View("GarageResult", pgvm);
+         
+     }
+
+     VehicleInGarage vig = new VehicleInGarage();
+     vig.GarageId = garageId;
+     vig.Vehicle = new Vehicle();
+     vig.Vehicle.LicencePlate = licencePlate;
+     vig.EntryTime = DateTime.Now;
+     vig.HourlyRate = 25;
+
+     garage.CurrentOccupancy++;
+
+     _unitOfWork.VehicleInGarageService.AddVehicleInGarage(vig);
+     _unitOfWork.SaveChanges();
+
+     ViewBag.SuccessMessage = $"Vehilce with licence plate {licencePlate} has entered the garage {garage.Name} at {vig.EntryTime} ";
+
+     var garagesAfterEnrty = _unitOfWork.GarageService.GetAllGarages();
+
+     var pgvmFinal = new PaginationViewModel<Garage>
+     {
+         TotalCount = garagesAfterEnrty.Count(),
+         CurrentPage = 1,
+         PageSize = 2,
+         Collection = garagesAfterEnrty.Take(2).ToList()
+     };
+
+     ViewData["CurrentStep"] = 4;
+     ViewData["IsConfirmationPage"] = true;
+
+     return View("GarageResult", pgvmFinal);
+     
+
+ }
+```
+
+ --- 12 use kace 
