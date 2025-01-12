@@ -2374,6 +2374,35 @@ Nakon toga korisnik bira iz liste ponudjeh garaza ,zeljenu garazu
 ![Chose a garage](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
        
 
+Klikom na garazu dobija slecedu stranicu 
+
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-Intro.jpg)
+
+`EnterVehilceDetails`  `Home` contkotrler 
+
+```csharp
+
+        [HttpGet]
+        public IActionResult EnterVehicleDetails(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            EnterVehicleModel evm = new EnterVehicleModel();
+
+            evm.GarageId = garage.GarageId;
+            evm.GarageName = garage.Name;
+            evm.GarageLocation = garage.Location;          
+            
+
+            return View(evm);
+        }
+```
+
 
 
 
