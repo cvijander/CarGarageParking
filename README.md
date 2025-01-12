@@ -2244,10 +2244,134 @@ Dakle kao sto se vidi prazan je model i ne prosldjuje se nista sa kontrolera, ko
   
 
 
+Dakle shodno rezultatu upita dobijaju se rezultati dok, kontroler kao takav zahteva string search i int page zbog dodate paginacije, kako bi rezultat mogao da se iskoristi kroz paginacju
 
+```csharp
+ [HttpGet]
+ public IActionResult SearchAGarage(string? search, int page = 1)
+ {
+     IEnumerable<Garage> garages = _unitOfWork.GarageService.GetAllGarages();            
+
+     if(!string.IsNullOrEmpty(search))
+     {
+         var result = search.Trim().ToLower();
+
+         garages = garages.Where(g => g.Name.ToLower().Contains(result) || g.Location.ToLower().Contains(result));
+     }
+
+     if (!garages.Any())
+     {
+         ViewBag.ErrorMessage = "No garages found for your search.";
+     }
+
+     
+     var pageSize = 2;
+
+     PaginationViewModel<Garage> pgvm = new PaginationViewModel<Garage>();
+     pgvm.TotalCount = garages.Count();
+     pgvm.CurrentPage = page;            
+     pgvm.PageSize = pageSize;
+     garages = garages.Skip(pageSize * (page - 1)).Take(pageSize);
+     pgvm.Collection = garages;
+
+     return View("GarageResult", pgvm );
+ }
+```
+
+i na view se prosledjuje kolekcija podataka - u ovom obliku to je kolekcija koja sadzrzi i paginacju 
+
+dok view izgleda 
 
  
+```csharp
 
+@model CarGarageParking.ViewModel.IPaginationViewModel<CarGarageParking.Models.Garage>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageResult.css" />
+</head>
+    @{
+        ViewData["Title"] = "Available garages";
+    }
+
+    @{
+    var isConfirmationPage = ViewData["IsConfirmationPage"] != null && (bool)ViewData["IsConfirmationPage"];
+    var currentStep = isConfirmationPage ? 4 : Convert.ToInt32(ViewData["CurrentStep"] ?? 1);
+    var totalSteps = 4;
+    var progressPercentage = (currentStep * 100 )/totalSteps;
+    }
+
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">@ViewBag.SuccessMessage</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<h3>Current Time: <span id="currentTime"></span></h3>
+
+
+    <div class="garage-container">
+        <div>
+            @foreach(Garage garage in Model.Collection)
+             {
+              <div class="garage-card">
+                <h2 class="text-primary"><strong>Garage name: </strong>@garage.Name</h2>
+                <h3 class="text-muted"><strong>Garage location:</strong> @garage.Location</h3>
+                <h3 class="text-success"><strong>Available spots: </strong>@garage.AvailableSpots</h3>
+                <a href="@Url.Action("EnterVehicleDetails","Home", new { id = garage.GarageId} )" class="btn btn-primary">Select a garage to enter</a>
+              </div>                
+              }
+        </div>
+    </div>
+    <div class="nav-links">
+         <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
+         <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-warning">Back to search a new garage</a>
+    </div>
+    
+
+@{
+    ViewData["SearchTerm"] = Context.Request.Query["search"].ToString();
+}
+    <div class="navigation">
+    @await Html.PartialAsync("_PaginationViewSearchAGarage", Model )
+    </div>
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped @((progressPercentage == 100 ? "bg-success" : "bg-info"))"
+         role="progressbar"
+         style="width: @progressPercentage%;"
+         aria-valuenow="@progressPercentage"
+         aria-valuemin="0"
+         aria-valuemax="100">
+        Step @currentStep of @totalSteps
+    </div>
+</div>
+<script>
+    function updateTime() {
+        var now = new Date();
+        document.getElementById("currentTime").innerText = now.toLocaleTimeString();
+    }
+
+    setInterval(updateTime, 1000); 
+    updateTime(); 
+</script>
+```
+
+Nakon toga korisnik bira iz liste ponudjeh garaza ,zeljenu garazu 
+![Chose a garage](CarParkingGarage/docs/images/SearchAGarage-Home.jpg)
        
 
 
