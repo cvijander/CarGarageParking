@@ -2403,6 +2403,70 @@ Klikom na garazu dobija slecedu stranicu
         }
 ```
 
+`EnterVehicleDetails`  view 
+
+```csharp
+@model CarGarageParking.ViewModel.EnterVehicleModel
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/EntertVehicleDetails.css" />
+</head>
+@{
+    ViewData["Title"] = "Enter a vehicle";
+}
+
+<h1>Enter vehicle details</h1>
+
+<div class="garage-info">
+    <h2><strong>Garage name:</strong> @Model.GarageName</h2>
+    <h3><strong>Garage Location: </strong> @Model.GarageLocation</h3>
+</div>
+
+<form asp-action="ConfirmVehicleEntry" asp-controller="Home" method="post">
+    <input type="hidden" name="GarageId" value="@Model.GarageId" />
+
+    <div class="form-group">
+        <label asp-for="LicencePlate">enter a licence plate</label>
+        <input type="text" asp-for="LicencePlate" class="form-control" required  maxlength="15" />
+        <span asp-validation-for="LicencePlate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="reset" class="btn btn-primary">Reset</button>
+    <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
+</form>
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+        Step 3 of 4
+    </div>
+</div>
+
+<style>
+  
+
+    
+    
+</style>
+
+<script>
+    function Time() {
+        var now = new Date();
+        document.getElementbyId("currentTime").innerText = now.toLocaleTimeString();
+    }
+    setInterval(Time, 1000);
+    Time();
+
+</script>
+```
+
+Dakle ovde koristnik zavisno od odabir garaze koji sustvaro dobijamo shodno get prosledjivanju vrednosti id od garaze. Nalazimo garazu, pravimo novi model koji sadzri podatke o garazi i podake za tablicu ,i prosledjujemo ga na view 
+
+Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gresku, dok ako nije, dobija poruku da je vozilo uspesno uslo u garazu i u tom vremenu 
+
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-AlreadyInGarage.jpg)
+
+![Chose a garage](CarGarageParking/docs/images/EnterVehicleDetails-SuccesfulIntro.jpg)
 
 
 
