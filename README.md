@@ -2649,7 +2649,82 @@ Njihova primena kako kod Use Case za uloazak vozila , tako i za listovanje garaz
 ```
 
 
+`Index`  akcija na `Garage` kontroleru 
 
+```csharp
+@model CarGarageParking.ViewModel.PaginationViewModel<Garage>
+
+    @{
+        ViewData["Title"] = "Show all garages";
+    }
+
+  
+ 
+    <form asp-action="Index" asp-controller="Garage" method="get">
+        <label for="name">Name:</label> 
+        <input type="text" id="name" name="name" value="@Context.Request.Query["name"]" />
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" value="@Context.Request.Query["location"]" />
+
+        <label for="maxCapacity">Capacity</label>
+        <input type="number" id="maxCapacity" name="maxCapacity" value="@Context.Request.Query["maxCapacity"]" />
+
+        <label for="availableSpots">Available spots</label>
+        <input type="number" id="availableSpots"  name="availableSpots" value="@Context.Request.Query["availableSpots"]" />
+
+          <!--   <label for="percent">Procenat popunjenosti</label>-->
+        <!--  <input type="number" id="percent" name="percent" value="@Context.Request.Query["percent"]" />-->
+        
+
+        <button type="submit" class="btn btn-primary">Submit</button>        
+        <a href="@Url.Action("Index","Garage")" class="btn btn-secondary" >Clear</a>
+    </form>
+
+
+
+<div class="garage-list">
+    @foreach (Garage singleGarage in Model.Collection)
+    {
+        <div class="garage-solo">            
+            @await Html.PartialAsync("_GarageHalfCard", singleGarage, new ViewDataDictionary(ViewData) { { "ShowLinkGarage", true } })                         
+        </div>
+    }
+</div>
+
+
+
+@await Html.PartialAsync("_PaginationViewIndex",Model)
+
+```
+
+`Info` akcija na `garage` kontroileru
+
+```csharp
+@model CarGarageParking.Models.Garage;
+
+    @{
+        ViewData["Title"] = $"{Model.Name}{Model.Location}";
+    }
+
+
+
+<h2>@Model.Name @Model.Location</h2>
+
+<div>
+    @await Html.PartialAsync("_GarageFullCard", Model, new ViewDataDictionary(ViewData) { { "ShowLinkFullGarage", false } })
+</div>
+
+
+<a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Back to all garages</a>
+<a href="@Url.Action("Edit","Garage", new {id = Model.GarageId })" class="btn btn-secondary">Edit a garage</a>
+<a href="@Url.Action("Delete","Garage",new {id = Model.GarageId})" class="btn btn-danger">Delete</a>
+```
+
+
+
+
+ 
 ### 13) 
 
 
