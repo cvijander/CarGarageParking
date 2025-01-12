@@ -1,4 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Security.AccessControl;
 
 namespace CarGarageParking.Models
 {
@@ -15,6 +20,9 @@ namespace CarGarageParking.Models
         public string LastName { get; set; }
 
         public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
+        public ICollection<VehicleInGarage> VehicleInGarages { get; set; } = new List<VehicleInGarage>();
+
 
     }
 }

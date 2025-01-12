@@ -7,11 +7,11 @@
     ViewData["Title"] = "Enter a vehicle";
 }
 
-<h1>Enter vehicle details</h1>
+<h1>Enter vehicle details for garage @Model.Garage.Name</h1>
 
 <div class="garage-info">
-    <h2><strong>Garage name:</strong> @Model.GarageName</h2>
-    <h3><strong>Garage Location: </strong> @Model.GarageLocation</h3>
+    @await Html.PartialAsync("_GarageHalfCard", Model.Garage, new ViewDataDictionary(ViewData) { { "ShowLink", false } })
+
 </div>
 
 <form asp-action="ConfirmVehicleEntry" asp-controller="Home" method="post">

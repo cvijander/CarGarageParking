@@ -1,7 +1,9 @@
 ﻿@model CarGarageParking.ViewModel.PaginationViewModel<Garage>
+
     @{
         ViewData["Title"] = "Show all garages";
     }
+
   
  
     <form asp-action="Index" asp-controller="Garage" method="get">
@@ -27,48 +29,18 @@
 
 
 
-    <div class="garage-list">
-        @foreach(Garage singleGarage in Model.Collection)
+<div class="garage-list">
+    @foreach (Garage singleGarage in Model.Collection)
     {
-        <div class="garage-solo">
-            <hr />
-            <h2>Naziv garaze: @singleGarage.Name</h2>
-            <h3>Broj slobodnih mesta: @singleGarage.AvailableSpots</h3>
-            @{
-                decimal OcupancyPercent = ((decimal)singleGarage.CurrentOccupancy / singleGarage.Capacity)*100;
-            }
-
-            <h3>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</h3>           
-            <h3>Da li je garaza puna? @(singleGarage.IsFull? "Jeste":"Nije")</h3>
-            <a href="@Url.Action("Info","Garage", new {Id = singleGarage.GarageId})">View more info</a>
-            <hr />
+        <div class="garage-solo">            
+            @await Html.PartialAsync("_GarageHalfCard", singleGarage, new ViewDataDictionary(ViewData) { { "ShowLinkGarage", true } })                         
         </div>
     }
-
-    </div>
-     
+</div>
 
 
 
-@await Html.PartialAsync("_PaginationView",Model)
-
-   
-
-
-
-
-    <style>
-
-    .garage-solo {
-        background-color: burlywood;
-        margin:15px;
-        padding-left:15px;
-    }
-        hr{
-            color:darkred;
-
-        }
-    </style>
+@await Html.PartialAsync("_PaginationViewIndex",Model)
 
 
 

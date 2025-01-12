@@ -1,4 +1,5 @@
 ﻿using CarGarageParking.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarGarageParking.Services
 {
@@ -29,12 +30,20 @@ namespace CarGarageParking.Services
 
         public IEnumerable<Garage> GetAllGarages()
         {
-            return _dbContext.Garages.ToList();
+            return _dbContext.Garages
+                .Include(g => g.VehicleInGarages)
+                .ThenInclude(vg => vg.Vehicle)
+                .ThenInclude(v => v.Owner)
+                .ToList();
         }
 
         public Garage GetGarageById(int id)
         {
-            return _dbContext.Garages.Find(id);
+            return _dbContext.Garages
+                   .Include(g => g.VehicleInGarages)
+                   .ThenInclude(vg => vg.Vehicle)
+                   .ThenInclude(v => v.Owner)
+                   .FirstOrDefault(g => g.GarageId == id);
         }
 
         public void Update(Garage garage)

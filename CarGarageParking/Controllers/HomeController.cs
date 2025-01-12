@@ -56,7 +56,7 @@ namespace CarGarageParking.Controllers
             garages = garages.Skip(pageSize * (page - 1)).Take(pageSize);
             pgvm.Collection = garages;
 
-            return View("GarageResult", pgvm );
+            return View( pgvm );
         }
 
        
@@ -74,10 +74,8 @@ namespace CarGarageParking.Controllers
             EnterVehicleModel evm = new EnterVehicleModel();
 
             evm.GarageId = garage.GarageId;
-            evm.GarageName = garage.Name;
-            evm.GarageLocation = garage.Location;          
+            evm.Garage = garage;
             
-
             return View(evm);
         }
 
@@ -100,7 +98,7 @@ namespace CarGarageParking.Controllers
                     Collection = garages.Take(pageSize)
                 };
 
-                return View("GarageResult", pgvm);
+                return View("SearchAGarage", pgvm);
                 
             }
 
@@ -118,7 +116,7 @@ namespace CarGarageParking.Controllers
                     Collection = garages.Take(pageSize)
                 };
 
-                return View("GarageResult", pgvm);
+                return View("SearchAGarage", pgvm);
                 
             }
 
@@ -149,7 +147,7 @@ namespace CarGarageParking.Controllers
             ViewData["CurrentStep"] = 4;
             ViewData["IsConfirmationPage"] = true;
 
-            return View("GarageResult", pgvmFinal);
+            return View("SearchAGarage", pgvmFinal);
             
 
         }

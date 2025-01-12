@@ -4,7 +4,10 @@
 @{
     var searchTerm = ViewData["SearchTerm"]?.ToString();
 }
+<head>
 
+    <link rel="stylesheet" href="~/css/Pagination.css" />
+</head>
     <nav class="Page-navigation">
 
     @if (Model.HasPrevious)
@@ -47,51 +50,5 @@
 
 
 <style>
-    .Page-navigation {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
-        gap: 10px;
-    }
-
-        .Page-navigation a {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-            .Page-navigation a:hover:not(.disabled) {
-                background-color: #007bff;
-                transform: scale(1.05);
-            }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: 1px solid #0056b3;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border: 1px solid #5a6268;
-    }
-
-    .btn-warning {
-        background-color: #ffc107;
-        border: 1px solid #d39e00;
-    }
-
-    .btn.disabled {
-        background-color: #e9ecef;
-        color: #6c757d;
-        pointer-events: none;
-    }
-
-    .Page-navigation a:not(.disabled) {
-        cursor: pointer;
-    }
+   
 </style>

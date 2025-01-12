@@ -1,0 +1,59 @@
+﻿
+@model CarGarageParking.Models.Garage
+<head>
+    <link rel="stylesheet" href="~/css/GarageCard.css" />
+
+    @{
+        ViewData["Title"] = $"{Model.Name} {Model.Location} full-info";
+    }
+
+</head>
+
+
+
+<div class="garage-info">
+    <h2 class="text-black"><strong>Garage id: </strong>@Model.GarageId</h2>
+    <h2 class="text-black-50"><strong>Garage name: </strong>@Model.Name</h2>
+    <h3 class="text-muted"><strong>Garage location:</strong> @Model.Location</h3>
+    <h3 class="text-muted"><strong>Garage capacity: </strong> @Model.Capacity</h3>
+    <h4 class="text-muted"><strong>Garage current capacity: </strong> @Model.CurrentOccupancy</h4>
+    @{
+        decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
+    }
+    <h3>Percent: @OcupancyPercent.ToString("F2") %</h3>
+    <h3 class="text-success"><strong>Available spots: </strong>@Model.AvailableSpots</h3>
+    <h4 class="text-black"><em> @(Model.IsFull ? "Yes, there is no more spaces": "No, there are more available spots")</em></h4>
+    
+    <div class="vhg">
+        <h3 class="text-primary">Vehicle currentu in garage: </h3>
+        <ul class="list-group">
+            @foreach (VehicleInGarage singleVehicle in Model.VehicleInGarages)
+            {
+                <li class="list-goup-item">
+                    <h4 class="text-muted"><strong>Vehicle licence plate:</strong> @singleVehicle.Vehicle.LicencePlate </h4>
+                    @if(singleVehicle.Vehicle.Owner !=null)
+                    {
+                        <h4 class="text-muted"><strong>Vehicle owner:</strong> @(singleVehicle.Vehicle.Owner.FirstName + singleVehicle.Vehicle.Owner.LastName)</h4>
+                    }
+                    else
+                    {
+                        <h4 class="text-muted"><strong>Vehicle owner:</strong> Unknown</h4>
+                    }
+
+                </li>
+            }
+        </ul>
+   </div> 
+   <a href ="@Url.Action("Index","Garage")" class="btn btn-primary">Back to garages</a>
+</div>
+
+
+
+
+
+
+
+  
+
+       
+

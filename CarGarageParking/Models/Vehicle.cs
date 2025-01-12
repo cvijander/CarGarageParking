@@ -15,5 +15,7 @@ namespace CarGarageParking.Models
         public int? OwnerId { get; set; }
 
         public Owner? Owner { get; set; }
+
+        public ICollection<VehicleInGarage> VehicleInGarages { get; set; } = new List<VehicleInGarage>();
     }
 }

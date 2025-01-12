@@ -36,20 +36,22 @@
 
 <h3>Current Time: <span id="currentTime"></span></h3>
 
+@{
+    var action = "EnterVehicleDetails";
+    var controler = "Home";
+}
+
 
     <div class="garage-container">
-        <div>
-            @foreach(Garage garage in Model.Collection)
-             {
-              <div class="garage-card">
-                <h2 class="text-primary"><strong>Garage name: </strong>@garage.Name</h2>
-                <h3 class="text-muted"><strong>Garage location:</strong> @garage.Location</h3>
-                <h3 class="text-success"><strong>Available spots: </strong>@garage.AvailableSpots</h3>
-                <a href="@Url.Action("EnterVehicleDetails","Home", new { id = garage.GarageId} )" class="btn btn-primary">Select a garage to enter</a>
-              </div>                
-              }
-        </div>
+        
+        @foreach (Garage garage in Model.Collection)
+        {
+        @await Html.PartialAsync("_GarageHalfCard", garage, new ViewDataDictionary(ViewData) { { "ShowLink", true } })
+        ;
+                     
+        }
     </div>
+   
     <div class="nav-links">
          <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
          <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-warning">Back to search a new garage</a>

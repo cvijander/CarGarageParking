@@ -58,6 +58,11 @@ namespace CarGarageParking.Controllers
         {
            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
 
+            if (garage == null)
+            {
+                return NotFound();
+            }
+
             return View(garage);
         }
 

@@ -1,31 +1,15 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model CarGarageParking.Models.Garage;
+﻿@model CarGarageParking.Models.Garage;
 
-@{
-    ViewData["Title"] = $"{Model.Name}{ Model.Location}";
-}
+    @{
+        ViewData["Title"] = $"{Model.Name}{Model.Location}";
+    }
+
+
 
 <h2>@Model.Name @Model.Location</h2>
 
 <div>
-    <ul>
-        <li>Garazni broj: @Model.GarageId</li>
-        <li>Naziv: @Model.Name</li>
-        <li>Lokacija: @Model.Location</li>
-        <li>Kapacitet : @Model.Capacity</li>
-        <li>Broj zauzetih mesta @Model.CurrentOccupancy </li>
-        <li>Broj trenutno slobodna mesta  @Model.AvailableSpots </li>
-        @{
-            decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
-        }
-
-        <li>Procenat popunjenosti: @OcupancyPercent.ToString("F2") %</li>
-        <li>Da li je garaza puna? @(Model.IsFull ? "Jeste" : "Nije")</li>                
-    </ul>
+    @await Html.PartialAsync("_GarageFullCard", Model, new ViewDataDictionary(ViewData) { { "ShowLinkFullGarage", false } })
 </div>
 
 

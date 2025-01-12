@@ -27,7 +27,7 @@ namespace CarGarageParking
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Garage>()
-                 .HasMany(g => g.VehicleInGarage)
+                 .HasMany(g => g.VehicleInGarages)
                  .WithOne(vg => vg.Garage)
                  .HasForeignKey(vg => vg.GarageId)
                  .OnDelete(DeleteBehavior.Cascade);
@@ -51,8 +51,26 @@ namespace CarGarageParking
                .HasPrecision(18, 2);
 
             modelBuilder.Entity<VehicleInGarage>()
-              .Property(vg => vg.HourlyRate)
-              .HasPrecision(18, 2);
+               .HasOne(vg => vg.Garage)
+               .WithMany(g => g.VehicleInGarages)
+               .HasForeignKey(vg => vg.GarageId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VehicleInGarage>()
+                .HasOne(vg => vg.Vehicle)
+                .WithMany(v => v.VehicleInGarages)
+                .HasForeignKey(vg => vg.VehicleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VehicleInGarage>()
+               .HasOne(vg => vg.Owner)
+               .WithMany(o => o.VehicleInGarages)
+               .HasForeignKey(vg => vg.OwnerId)
+               .OnDelete(DeleteBehavior.SetNull); 
+
+            modelBuilder.Entity<VehicleInGarage>()
+                .Property(vg => vg.HourlyRate)
+                .HasPrecision(18, 2);
 
         }
 

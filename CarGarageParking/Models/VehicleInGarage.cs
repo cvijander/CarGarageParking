@@ -1,9 +1,11 @@
 ﻿using CarGarageParking.Util;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarGarageParking.Models
 {
+    
     public class VehicleInGarage
     {
         public int VehicleInGarageId { get; set; }
