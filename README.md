@@ -1935,15 +1935,443 @@ Osnovni scenario
 ispunjava ove uslove i da je naravno garaza dostupna tj da ima dovoljno mesta `IsFull` = false . Tada iz dobijenog spiska garaza korisnik odabira jednu i ulazi u istu ,tako sto unosi vrednost samog vozila tj `LicencePlate` i dobija poruku da je vozilo sa 
 tim verdnostima sacuvano u garazi.
 
-![Garage Example](docs/images/Index-Home.jpg)
+![Index stranica](CarGarageParking/docs/images/Index-Home.jpg)
 
 - 1  Na `Index` stranici u okviru `Home` konitrolera imamo 3 dugmeta , `Enter vehicle`, `Exit vehicle` i `Become a user`
-- 2 Klikom na Enetr
+
+  `Index` akcija `Home` cnotroler
+
+`Home` controler - ceo kod 
+
+  ```csharp
+  using CarGarageParking.Models;
+using CarGarageParking.Services;
+using CarGarageParking.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+
+namespace CarGarageParking.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public HomeController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
 
 
+        [HttpGet]
+        public IActionResult EnterVehicle()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult SearchAGarage(string? search, int page = 1)
+        {
+            IEnumerable<Garage> garages = _unitOfWork.GarageService.GetAllGarages();            
+
+            if(!string.IsNullOrEmpty(search))
+            {
+                var result = search.Trim().ToLower();
+
+                garages = garages.Where(g => g.Name.ToLower().Contains(result) || g.Location.ToLower().Contains(result));
+            }
+
+            if (!garages.Any())
+            {
+                ViewBag.ErrorMessage = "No garages found for your search.";
+            }
+
+            
+            var pageSize = 2;
+
+            PaginationViewModel<Garage> pgvm = new PaginationViewModel<Garage>();
+            pgvm.TotalCount = garages.Count();
+            pgvm.CurrentPage = page;            
+            pgvm.PageSize = pageSize;
+            garages = garages.Skip(pageSize * (page - 1)).Take(pageSize);
+            pgvm.Collection = garages;
+
+            return View("GarageResult", pgvm );
+        }
+
+       
+
+        [HttpGet]
+        public IActionResult EnterVehicleDetails(int id)
+        {
+            Garage garage = _unitOfWork.GarageService.GetGarageById(id);
+
+            if(garage == null)
+            {
+                return NotFound();
+            }
+
+            EnterVehicleModel evm = new EnterVehicleModel();
+
+            evm.GarageId = garage.GarageId;
+            evm.GarageName = garage.Name;
+            evm.GarageLocation = garage.Location;          
+            
+
+            return View(evm);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmVehicleEntry(int garageId, string licencePlate)
+        {
+            var existingVehicle = _unitOfWork.VehicleInGarageService.GetAllVehicleInGarage().FirstOrDefault(v => v.Vehicle != null && v.Vehicle.LicencePlate == licencePlate && v.IsVehicleStillInGarage);
+
+            if(existingVehicle != null)
+            {
+                ViewBag.ErrorMessage = "Vehicle is already in garege";
+
+                var garages = _unitOfWork.GarageService.GetAllGarages();
+                var pageSize = 2;
+                var pgvm = new PaginationViewModel<Garage>
+                {
+                    TotalCount = garages.Count(),
+                    CurrentPage = 1,
+                    PageSize = pageSize,
+                    Collection = garages.Take(pageSize)
+                };
+
+                return View("GarageResult", pgvm);
+                
+            }
+
+            Garage garage = _unitOfWork.GarageService.GetGarageById(garageId);
+            if(garage == null || garage.IsFull)
+            {
+                ViewBag.ErrorMessage = "Garage is full or not found";
+                var garages = _unitOfWork.GarageService.GetAllGarages();
+                var pageSize = 2;
+                var pgvm = new PaginationViewModel<Garage>
+                {
+                    TotalCount = garages.Count(),
+                    CurrentPage = 1, 
+                    PageSize = pageSize,
+                    Collection = garages.Take(pageSize)
+                };
+
+                return View("GarageResult", pgvm);
+                
+            }
+
+            VehicleInGarage vig = new VehicleInGarage();
+            vig.GarageId = garageId;
+            vig.Vehicle = new Vehicle();
+            vig.Vehicle.LicencePlate = licencePlate;
+            vig.EntryTime = DateTime.Now;
+            vig.HourlyRate = 25;
+
+            garage.CurrentOccupancy++;
+
+            _unitOfWork.VehicleInGarageService.AddVehicleInGarage(vig);
+            _unitOfWork.SaveChanges();
+
+            ViewBag.SuccessMessage = $"Vehilce with licence plate {licencePlate} has entered the garage {garage.Name} at {vig.EntryTime} ";
+
+            var garagesAfterEnrty = _unitOfWork.GarageService.GetAllGarages();
+
+            var pgvmFinal = new PaginationViewModel<Garage>
+            {
+                TotalCount = garagesAfterEnrty.Count(),
+                CurrentPage = 1,
+                PageSize = 2,
+                Collection = garagesAfterEnrty.Take(2).ToList()
+            };
+
+            ViewData["CurrentStep"] = 4;
+            ViewData["IsConfirmationPage"] = true;
+
+            return View("GarageResult", pgvmFinal);
+            
+
+        }
+
+        [HttpGet]
+        public IActionResult ExitVehicle()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult RegisterUser()
+        {
+            return View();
+        }
+
+    
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        
+        
+    }
+}
+```
+
+ Akcija `Index` za `Home` contorler 
+
+ ```csharp
+     [HttpGet]
+     public IActionResult Index()
+     {
+         return View();
+     }
+```
+
+`Index` -`view` 
+
+```csharp
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@{
+    ViewData["Title"] = "Home Garage Page";
+}
+
+<div class="container text-black align-content-center mt-5">
+    <h1 class="mb-4">Welcome to Car Garage Parking</h1>
+    <h2 class="mb-5 text-muted">Hope you stay long and always find a spot in garage</h2>
+
+    <div class="d-grid gap-4 d-md-flex justify-content-center button-container">
+        <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-primary btn-lg"><i class="bi bi-car-front"></i>Enter vehicle</a>
+        <a href="@Url.Action("ExitVehicle","Home")" class="btn btn-secondary btn-lg"><i class="bi bi-box-arrow-left"></i>Exit vehicle</a>
+        <a href="@Url.Action("RegisterUser","Home")" class="btn btn-success btn-lg"><i class="bi bi-person-plus"></i>Become  a user</a>
+    </div>
+</div>
+```
+
+Dakle kao sto se vidi sama Akcija index vraca prazan view dakle ne prosledjuje nista , dok na stranici `view` mozemo da vidimo da samo imamo prikazana 3 dugmeta koji vode na svoje putanje tj akcije 
+
+ - 2  Klikom na `EnterVehicle` dobijamo sledeci slucaj
+
+   ![Enter Vehicle](CarGarageParking/docs/images/EnterVehicle-Home.jpg) 
+
+Akcija  `EnterVehicle` home kontroler
+
+```csharp
+    [HttpGet]
+    public IActionResult EnterVehicle()
+    {
+        return View();
+    }
+```
+
+`EnterVehicle` `view`
+
+```csharp
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@{
+    ViewData["Title"] = "Find a garage";
+}
+<div class="container text-black align-content-center mt-5">
+        <h1 class="mb-4">Find a specific or local garage</h1>
+
+    <form asp-action="SearchAGarage" asp-controller="Home" method="get" class="form-search">
+        <div class="form-group">
+            <label for="search" class="form-label text-muted ">Enter a garage name or location</label>
+            <input type="text" id="search" name="search" required class="form-control"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg bd-md-block">Search</button>
+        <a href="@Url.Action("Index","Home")" class="btn btn-secondary btn-lg d-md-block">Cancel</a>
+    </form>
+    <div class="progress mt-4">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            Step 1 of 4
+        </div>
+    </div>
+</div>
+<style>
+    .form-search {
+       max-width:600px;
+       margin: 50px auto;
+       padding: 30px;
+       border:1px solid #dee2e6;
+       border-radius:20px;
+       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+       background-color:#ffffff;
+
+    }
+
+    .form-group{
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        height:50px;
+        padding:10px 15px;
+        font-size:1.1rem;
+        border-radius:10px;
+        border:1px solid #ced4da;
+
+    }
+       
+</style>
+
+```
+ 
+Dakle kao sto se vidi prazan je model i ne prosldjuje se nista sa kontrolera, korisnik nakon toga unosi vrednost -naziv ili vec lokaciju - i na osnovu te infomracije dobija odgovor 
+- ili je spisak tj lista dostupnih garaza koje imaju mesta  i odgovaraju upitu ili je vec slucaj da ne postoji takva garaza
+
+  ![Enter vehicle unos ok](CarGarageParking/docs/images/EnterVehicle-Home-UnosOk.jpg)
+  ![Enter vehicle rezultat ](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
+
+  ili ako je vec los unos
+  ![Enter vehicle unos ok](CarGarageParking/docs/images/EnterVehicle-Home-UnosLos.jpg)
+  ![Enter vehicle unos ok](CarGarageParking/docs/images/SearchAGarage-Home-Los.jpg)
+  
+
+
+Dakle shodno rezultatu upita dobijaju se rezultati dok, kontroler kao takav zahteva string search i int page zbog dodate paginacije, kako bi rezultat mogao da se iskoristi kroz paginacju
+
+```csharp
+ [HttpGet]
+ public IActionResult SearchAGarage(string? search, int page = 1)
+ {
+     IEnumerable<Garage> garages = _unitOfWork.GarageService.GetAllGarages();            
+
+     if(!string.IsNullOrEmpty(search))
+     {
+         var result = search.Trim().ToLower();
+
+         garages = garages.Where(g => g.Name.ToLower().Contains(result) || g.Location.ToLower().Contains(result));
+     }
+
+     if (!garages.Any())
+     {
+         ViewBag.ErrorMessage = "No garages found for your search.";
+     }
+
+     
+     var pageSize = 2;
+
+     PaginationViewModel<Garage> pgvm = new PaginationViewModel<Garage>();
+     pgvm.TotalCount = garages.Count();
+     pgvm.CurrentPage = page;            
+     pgvm.PageSize = pageSize;
+     garages = garages.Skip(pageSize * (page - 1)).Take(pageSize);
+     pgvm.Collection = garages;
+
+     return View("GarageResult", pgvm );
+ }
+```
+
+i na view se prosledjuje kolekcija podataka - u ovom obliku to je kolekcija koja sadzrzi i paginacju 
+
+dok view izgleda 
 
  
+```csharp
 
+@model CarGarageParking.ViewModel.IPaginationViewModel<CarGarageParking.Models.Garage>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageResult.css" />
+</head>
+    @{
+        ViewData["Title"] = "Available garages";
+    }
+
+    @{
+    var isConfirmationPage = ViewData["IsConfirmationPage"] != null && (bool)ViewData["IsConfirmationPage"];
+    var currentStep = isConfirmationPage ? 4 : Convert.ToInt32(ViewData["CurrentStep"] ?? 1);
+    var totalSteps = 4;
+    var progressPercentage = (currentStep * 100 )/totalSteps;
+    }
+
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">@ViewBag.SuccessMessage</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<h3>Current Time: <span id="currentTime"></span></h3>
+
+
+    <div class="garage-container">
+        <div>
+            @foreach(Garage garage in Model.Collection)
+             {
+              <div class="garage-card">
+                <h2 class="text-primary"><strong>Garage name: </strong>@garage.Name</h2>
+                <h3 class="text-muted"><strong>Garage location:</strong> @garage.Location</h3>
+                <h3 class="text-success"><strong>Available spots: </strong>@garage.AvailableSpots</h3>
+                <a href="@Url.Action("EnterVehicleDetails","Home", new { id = garage.GarageId} )" class="btn btn-primary">Select a garage to enter</a>
+              </div>                
+              }
+        </div>
+    </div>
+    <div class="nav-links">
+         <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
+         <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-warning">Back to search a new garage</a>
+    </div>
+    
+
+@{
+    ViewData["SearchTerm"] = Context.Request.Query["search"].ToString();
+}
+    <div class="navigation">
+    @await Html.PartialAsync("_PaginationViewSearchAGarage", Model )
+    </div>
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped @((progressPercentage == 100 ? "bg-success" : "bg-info"))"
+         role="progressbar"
+         style="width: @progressPercentage%;"
+         aria-valuenow="@progressPercentage"
+         aria-valuemin="0"
+         aria-valuemax="100">
+        Step @currentStep of @totalSteps
+    </div>
+</div>
+<script>
+    function updateTime() {
+        var now = new Date();
+        document.getElementById("currentTime").innerText = now.toLocaleTimeString();
+    }
+
+    setInterval(updateTime, 1000); 
+    updateTime(); 
+</script>
+```
+
+Nakon toga korisnik bira iz liste ponudjeh garaza ,zeljenu garazu 
+![Chose a garage](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
        
 
 
