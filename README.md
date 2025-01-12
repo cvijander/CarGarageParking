@@ -2232,6 +2232,11 @@ Akcija  `EnterVehicle` home kontroler
 
 ```
  
+Dakle kao sto se vidi prazan je model i ne prosldjuje se nista sa kontrolera, korisnik nakon toga unosi vrednost -naziv ili vec lokaciju - i na osnovu te infomracije dobija odgovor 
+- ili je spisak tj lista dostupnih garaza koje imaju mesta  i odgovaraju upitu ili je vec slucaj da ne postoji takva garaza
+
+  ![Enter vehicle rezultat ](CarGarageParking/docs/images/SearchAGarage-Home.jpg)
+  ![Enter vehicle unos ok](CarGarageParking/docs/images/EnterVehicle-Home-UnosOk.jpg)
 
 
 
