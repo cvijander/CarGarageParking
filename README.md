@@ -1907,8 +1907,38 @@ namespace CarGarageParking.ViewModel
 </style>
 ```
 
+### 11) SK: Slucaj koriscenja - Ulazak vozila u garazu 
+Naziv SK 
+Ulazak vozila u garazu
 
+Aktori SK 
+Korisnik 
 
+Ucesnici SK 
+Korisnik i sistem 
+
+Preduslov :
+Garaza postoji shodno upitu koji je trazen,  postoji dovoljno mesta u garazama  i tablica je noralmo popunjena 
+
+Osnovni scenario 
+1. Korsnik unosi u pretrazi lokaciju ili naziv garaze
+2.  Sismtem vraca listu garaza koji ispunjavaju uslov
+3.  Korisnik zatim odabira zeljenu garazu
+4.  Korisnik unosi podatke o LicencePlate
+5.  Sistem potvrdjuje korisniku da je Vozilo sa tom tablicom uspesno uslo u garazu u to i to vreme
+
+   Alternativna scenarija 
+   2.1 Sistem vraca da ne postoji garaza shodno tom uslovu 
+   5.1 Sistem daje korisniku informaciju da vozilo je vec u garazi 
+   
+ Korisnik ulazi u garazu, pri cemu nakon klika `Enter vehicle` korisnik dobija opciju preko search dugmeta da pronadje garazu shodno upitu, pri cemu upit je vezan za naziv garaze ili vec lokaciju ,dakle poredi se po oba uslova , da li nas spisak garaza 
+ispunjava ove uslove i da je naravno garaza dostupna tj da ima dovoljno mesta `IsFull` = false . Tada iz dobijenog spiska garaza korisnik odabira jednu i ulazi u istu ,tako sto unosi vrednost samog vozila tj `LicencePlate` i dobija poruku da je vozilo sa 
+tim verdnostima sacuvano u garazi.
+
+![Garage Example](docs/images/Index-Home.jpg)
+
+- 1  Na `Index` stranici u okviru `Home` konitrolera imamo 3 dugmeta , `Enter vehicle`, `Exit vehicle` i `Become a user`
+- 2 Klikom na Enetr
 
 
 
