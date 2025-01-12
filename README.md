@@ -2551,6 +2551,7 @@ Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gre
 
  --- 12 use kace 
 ### 12) Kreiranje partial view za Garage dva modela ,jedan sa Half informacijama i drugi full sa listom vozila
+Njihova primena kako kod Use Case za uloazak vozila , tako i za listovanje garaza u okviru `Index` i `Info` na `Garage` kontroleru
 
 `_GarageHalfCard`
 
@@ -2649,7 +2650,7 @@ Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gre
 
 
 
-
+### 13) 
 
 
   
