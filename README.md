@@ -2158,10 +2158,80 @@ namespace CarGarageParking.Controllers
 </div>
 ```
 
+Dakle kao sto se vidi sama Akcija index vraca prazan view dakle ne prosledjuje nista , dok na stranici `view` mozemo da vidimo da samo imamo prikazana 3 dugmeta koji vode na svoje putanje tj akcije 
+
  - 2  Klikom na `EnterVehicle` dobijamo sledeci slucaj
 
    ![Enter Vehicle](CarGarageParking/docs/images/EnterVehicle-Home.jpg) 
 
+Akcija  `EnterVehicle` home kontroler
+
+```csharp
+    [HttpGet]
+    public IActionResult EnterVehicle()
+    {
+        return View();
+    }
+```
+
+`EnterVehicle` `view`
+
+```csharp
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@{
+    ViewData["Title"] = "Find a garage";
+}
+<div class="container text-black align-content-center mt-5">
+        <h1 class="mb-4">Find a specific or local garage</h1>
+
+    <form asp-action="SearchAGarage" asp-controller="Home" method="get" class="form-search">
+        <div class="form-group">
+            <label for="search" class="form-label text-muted ">Enter a garage name or location</label>
+            <input type="text" id="search" name="search" required class="form-control"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg bd-md-block">Search</button>
+        <a href="@Url.Action("Index","Home")" class="btn btn-secondary btn-lg d-md-block">Cancel</a>
+    </form>
+    <div class="progress mt-4">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            Step 1 of 4
+        </div>
+    </div>
+</div>
+<style>
+    .form-search {
+       max-width:600px;
+       margin: 50px auto;
+       padding: 30px;
+       border:1px solid #dee2e6;
+       border-radius:20px;
+       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+       background-color:#ffffff;
+
+    }
+
+    .form-group{
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        height:50px;
+        padding:10px 15px;
+        font-size:1.1rem;
+        border-radius:10px;
+        border:1px solid #ced4da;
+
+    }
+       
+</style>
+
+```
+ 
 
 
 
