@@ -1935,7 +1935,7 @@ Osnovni scenario
 ispunjava ove uslove i da je naravno garaza dostupna tj da ima dovoljno mesta `IsFull` = false . Tada iz dobijenog spiska garaza korisnik odabira jednu i ulazi u istu ,tako sto unosi vrednost samog vozila tj `LicencePlate` i dobija poruku da je vozilo sa 
 tim verdnostima sacuvano u garazi.
 
-![Index stranica](docs/images/Index-Home.jpg)
+![Index stranica](CarGarageParking/docs/images/Index-Home.jpg)
 
 - 1  Na `Index` stranici u okviru `Home` konitrolera imamo 3 dugmeta , `Enter vehicle`, `Exit vehicle` i `Become a user`
 - 2 Klikom na Enetr
