@@ -1,9 +1,21 @@
 ﻿
-@model IEnumerable<CarGarageParking.Models.Garage>
+@model CarGarageParking.ViewModel.IPaginationViewModel<CarGarageParking.Models.Garage>
 
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageResult.css" />
+</head>
     @{
         ViewData["Title"] = "Available garages";
     }
+
+    @{
+    var isConfirmationPage = ViewData["IsConfirmationPage"] != null && (bool)ViewData["IsConfirmationPage"];
+    var currentStep = isConfirmationPage ? 4 : Convert.ToInt32(ViewData["CurrentStep"] ?? 1);
+    var totalSteps = 4;
+    var progressPercentage = (currentStep * 100 )/totalSteps;
+    }
+
 
 @if (ViewBag.ErrorMessage != null)
 {
@@ -27,53 +39,40 @@
 
     <div class="garage-container">
         <div>
-            @foreach(Garage garage in Model)
+            @foreach(Garage garage in Model.Collection)
              {
               <div class="garage-card">
-                <h2>@garage.Name</h2>
-                <h3>@garage.Location</h3>
-                <h3>@garage.AvailableSpots</h3>
+                <h2 class="text-primary"><strong>Garage name: </strong>@garage.Name</h2>
+                <h3 class="text-muted"><strong>Garage location:</strong> @garage.Location</h3>
+                <h3 class="text-success"><strong>Available spots: </strong>@garage.AvailableSpots</h3>
                 <a href="@Url.Action("EnterVehicleDetails","Home", new { id = garage.GarageId} )" class="btn btn-primary">Select a garage to enter</a>
               </div>                
               }
         </div>
     </div>
+    <div class="nav-links">
+         <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
+         <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-warning">Back to search a new garage</a>
+    </div>
+    
 
-    <a href="@Url.Action("Index","Home")" class="btn btn-danger">Cancel all and go to home page</a>
-    <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-warning">Back to search a new garage</a>
+@{
+    ViewData["SearchTerm"] = Context.Request.Query["search"].ToString();
+}
+    <div class="navigation">
+    @await Html.PartialAsync("_PaginationViewSearchAGarage", Model )
+    </div>
 
-    <style>
-        .garage-card{
-            border:1px solid black;   
-            margin: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        .btn {
-            margin: 10px 5px;
-        }
-
-        .alert {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-</style>
-        
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped @((progressPercentage == 100 ? "bg-success" : "bg-info"))"
+         role="progressbar"
+         style="width: @progressPercentage%;"
+         aria-valuenow="@progressPercentage"
+         aria-valuemin="0"
+         aria-valuemax="100">
+        Step @currentStep of @totalSteps
+    </div>
+</div>
 <script>
     function updateTime() {
         var now = new Date();

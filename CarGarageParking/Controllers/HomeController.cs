@@ -30,25 +30,33 @@ namespace CarGarageParking.Controllers
         }
 
         [HttpGet]
-        public IActionResult SearchAGarage(string? search)
+        public IActionResult SearchAGarage(string? search, int page = 1)
         {
-            IEnumerable<Garage> garages = _unitOfWork.GarageService.GetAllGarages();
-
-            
+            IEnumerable<Garage> garages = _unitOfWork.GarageService.GetAllGarages();            
 
             if(!string.IsNullOrEmpty(search))
             {
                 var result = search.Trim().ToLower();
 
-                garages = _unitOfWork.GarageService.GetAllGarages().Where(g => g.Name.ToLower().Contains(result) || g.Location.ToLower().Contains(result));
+                garages = garages.Where(g => g.Name.ToLower().Contains(result) || g.Location.ToLower().Contains(result));
             }
 
             if (!garages.Any())
             {
                 ViewBag.ErrorMessage = "No garages found for your search.";
             }
+
             
-            return View("GarageResult", garages);
+            var pageSize = 2;
+
+            PaginationViewModel<Garage> pgvm = new PaginationViewModel<Garage>();
+            pgvm.TotalCount = garages.Count();
+            pgvm.CurrentPage = page;            
+            pgvm.PageSize = pageSize;
+            garages = garages.Skip(pageSize * (page - 1)).Take(pageSize);
+            pgvm.Collection = garages;
+
+            return View("GarageResult", pgvm );
         }
 
        
@@ -80,15 +88,38 @@ namespace CarGarageParking.Controllers
 
             if(existingVehicle != null)
             {
-                ViewBag.ErrorMessage = "Vehicle is in garege";
-                return View("GarageResult", _unitOfWork.GarageService.GetAllGarages());
+                ViewBag.ErrorMessage = "Vehicle is already in garege";
+
+                var garages = _unitOfWork.GarageService.GetAllGarages();
+                var pageSize = 2;
+                var pgvm = new PaginationViewModel<Garage>
+                {
+                    TotalCount = garages.Count(),
+                    CurrentPage = 1,
+                    PageSize = pageSize,
+                    Collection = garages.Take(pageSize)
+                };
+
+                return View("GarageResult", pgvm);
+                
             }
 
             Garage garage = _unitOfWork.GarageService.GetGarageById(garageId);
             if(garage == null || garage.IsFull)
             {
                 ViewBag.ErrorMessage = "Garage is full or not found";
-                return View("GarageResult", _unitOfWork.GarageService.GetAllGarages());
+                var garages = _unitOfWork.GarageService.GetAllGarages();
+                var pageSize = 2;
+                var pgvm = new PaginationViewModel<Garage>
+                {
+                    TotalCount = garages.Count(),
+                    CurrentPage = 1, 
+                    PageSize = pageSize,
+                    Collection = garages.Take(pageSize)
+                };
+
+                return View("GarageResult", pgvm);
+                
             }
 
             VehicleInGarage vig = new VehicleInGarage();
@@ -105,8 +136,21 @@ namespace CarGarageParking.Controllers
 
             ViewBag.SuccessMessage = $"Vehilce with licence plate {licencePlate} has entered the garage {garage.Name} at {vig.EntryTime} ";
 
-            return View("GarageResult", _unitOfWork.GarageService.GetAllGarages());
+            var garagesAfterEnrty = _unitOfWork.GarageService.GetAllGarages();
 
+            var pgvmFinal = new PaginationViewModel<Garage>
+            {
+                TotalCount = garagesAfterEnrty.Count(),
+                CurrentPage = 1,
+                PageSize = 2,
+                Collection = garagesAfterEnrty.Take(2).ToList()
+            };
+
+            ViewData["CurrentStep"] = 4;
+            ViewData["IsConfirmationPage"] = true;
+
+            return View("GarageResult", pgvmFinal);
+            
 
         }
 

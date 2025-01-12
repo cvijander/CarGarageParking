@@ -1,0 +1,97 @@
+﻿@model CarGarageParking.ViewModel.IPaginationViewModel<CarGarageParking.Models.Garage>
+
+    
+@{
+    var searchTerm = ViewData["SearchTerm"]?.ToString();
+}
+
+    <nav class="Page-navigation">
+
+    @if (Model.HasPrevious)
+    {
+        <a href="@Url.Action("SearchAGarage","Home", new { page = (Model.CurrentPage-1), search = searchTerm })" class="btn btn-primary">Previous |</a>
+    }
+    else
+    {
+        <a class="btn btn-primary disabled">Previous</a>
+    }
+
+    <div class="pagination-links">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            if (Model.CurrentPage == i)
+            {
+                <a href="@Url.Action("SearchAGarage","Home", new {page = i, search = searchTerm})" class="btn disabled">@i</a>
+            }
+            else
+            {
+                <a href="@Url.Action("SearchAGarage","Home", new {page = i, search = searchTerm})" class="btn btn-warning">@i</a>
+            }
+
+        }
+    </div>
+    @if (Model.HasNext)
+    {
+        <a href="@Url.Action("SearchAGarage","Home", new { page = (Model.CurrentPage+1), search = searchTerm })" class="btn btn-secondary">| Next</a>
+    }
+    else
+    {
+        <a class="btn btn-secondary disabled">Next</a>
+    }
+
+
+    
+
+   
+    </nav>
+
+
+<style>
+    .Page-navigation {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+
+        .Page-navigation a {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .Page-navigation a:hover:not(.disabled) {
+                background-color: #007bff;
+                transform: scale(1.05);
+            }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: 1px solid #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: 1px solid #5a6268;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: 1px solid #d39e00;
+    }
+
+    .btn.disabled {
+        background-color: #e9ecef;
+        color: #6c757d;
+        pointer-events: none;
+    }
+
+    .Page-navigation a:not(.disabled) {
+        cursor: pointer;
+    }
+</style>

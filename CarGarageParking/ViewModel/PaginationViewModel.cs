@@ -1,6 +1,6 @@
 ﻿namespace CarGarageParking.ViewModel
 {
-    public class PaginationViewModel<T> :IPaginationViewModel where T : class
+    public class PaginationViewModel<T> :IPaginationViewModel<T> where T : class
     {
         public IEnumerable<T> Collection { get; set; }
 

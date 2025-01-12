@@ -1,6 +1,6 @@
 ﻿namespace CarGarageParking.ViewModel
 {
-    public interface IPaginationViewModel
+    public interface IPaginationViewModel<T>where T : class
     {
         
         public int TotalPages { get; }
@@ -9,5 +9,11 @@
 
         public bool HasPrevious { get; }    
         public bool HasNext { get;}
+
+        IEnumerable<T> Collection { get; set; }
+
+
+
+
     }
 }

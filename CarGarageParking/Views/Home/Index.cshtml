@@ -1,53 +1,22 @@
-﻿@{
+﻿<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@{
     ViewData["Title"] = "Home Garage Page";
 }
 
-<h1>Welcome to Car Garage Parking</h1>
+<div class="container text-black align-content-center mt-5">
+    <h1 class="mb-4">Welcome to Car Garage Parking</h1>
+    <h2 class="mb-5 text-muted">Hope you stay long and always find a spot in garage</h2>
 
-<h2>Hope you stay long and always find a spot in garage</h2>
-
-<div class="button-container">
-    <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-primary">Enter vehicle</a>
-    <a href="@Url.Action("ExitVehicle","Home")" class="btn btn-secondary">Exit vehicle</a> 
-    <a href="@Url.Action("RegisterUser","Home")" class="btn btn-success">Become a user</a>
+    <div class="d-grid gap-4 d-md-flex justify-content-center button-container">
+        <a href="@Url.Action("EnterVehicle","Home")" class="btn btn-primary btn-lg"><i class="bi bi-car-front"></i>Enter vehicle</a>
+        <a href="@Url.Action("ExitVehicle","Home")" class="btn btn-secondary btn-lg"><i class="bi bi-box-arrow-left"></i>Exit vehicle</a>
+        <a href="@Url.Action("RegisterUser","Home")" class="btn btn-success btn-lg"><i class="bi bi-person-plus"></i>Become  a user</a>
+    </div>
 </div>
 
-<style>
-    .button-container {
-        margin:150px auto;
-        border:1px solid gray;
-        border-radius:55px;
-    }
 
-    .btn {
-        padding:15px 25px;
-        font-size:larger;
-        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-        margin: 15px;
-        text-decoration:none;
-        color:white;
-        border: 1px solid gray;
-        width: 350px;
-        
-
-    }
-
-    .btn-primary{
-        border-bottom-left-radius:55px;
-        border-top-left-radius:55px;
-    }
-
-    .btn-secondary{
-        margin-left:85px;
-        margin-right:85px;
-    }
-
-    .btn-success{
-        border-bottom-right-radius: 55px;
-        border-top-right-radius: 55px;
-    }
-
-
-
-</style>
 
