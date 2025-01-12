@@ -2470,5 +2470,82 @@ Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gre
 
 
 
-  
+  i http zahtev koji je zaduzen za snimanje 
+
+  `ConfirmVehicleEntry` akcija za potvrdu snimanja 
+
+```csharp
+ [HttpPost]
+ public IActionResult ConfirmVehicleEntry(int garageId, string licencePlate)
+ {
+     var existingVehicle = _unitOfWork.VehicleInGarageService.GetAllVehicleInGarage().FirstOrDefault(v => v.Vehicle != null && v.Vehicle.LicencePlate == licencePlate && v.IsVehicleStillInGarage);
+
+     if(existingVehicle != null)
+     {
+         ViewBag.ErrorMessage = "Vehicle is already in garege";
+
+         var garages = _unitOfWork.GarageService.GetAllGarages();
+         var pageSize = 2;
+         var pgvm = new PaginationViewModel<Garage>
+         {
+             TotalCount = garages.Count(),
+             CurrentPage = 1,
+             PageSize = pageSize,
+             Collection = garages.Take(pageSize)
+         };
+
+         return View("GarageResult", pgvm);
+         
+     }
+
+     Garage garage = _unitOfWork.GarageService.GetGarageById(garageId);
+     if(garage == null || garage.IsFull)
+     {
+         ViewBag.ErrorMessage = "Garage is full or not found";
+         var garages = _unitOfWork.GarageService.GetAllGarages();
+         var pageSize = 2;
+         var pgvm = new PaginationViewModel<Garage>
+         {
+             TotalCount = garages.Count(),
+             CurrentPage = 1, 
+             PageSize = pageSize,
+             Collection = garages.Take(pageSize)
+         };
+
+         return View("GarageResult", pgvm);
+         
+     }
+
+     VehicleInGarage vig = new VehicleInGarage();
+     vig.GarageId = garageId;
+     vig.Vehicle = new Vehicle();
+     vig.Vehicle.LicencePlate = licencePlate;
+     vig.EntryTime = DateTime.Now;
+     vig.HourlyRate = 25;
+
+     garage.CurrentOccupancy++;
+
+     _unitOfWork.VehicleInGarageService.AddVehicleInGarage(vig);
+     _unitOfWork.SaveChanges();
+
+     ViewBag.SuccessMessage = $"Vehilce with licence plate {licencePlate} has entered the garage {garage.Name} at {vig.EntryTime} ";
+
+     var garagesAfterEnrty = _unitOfWork.GarageService.GetAllGarages();
+
+     var pgvmFinal = new PaginationViewModel<Garage>
+     {
+         TotalCount = garagesAfterEnrty.Count(),
+         CurrentPage = 1,
+         PageSize = 2,
+         Collection = garagesAfterEnrty.Take(2).ToList()
+     };
+
+     ViewData["CurrentStep"] = 4;
+     ViewData["IsConfirmationPage"] = true;
+
+     return View("GarageResult", pgvmFinal);
+     
+
+ }
+```
 
