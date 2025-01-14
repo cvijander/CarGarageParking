@@ -11,5 +11,7 @@
         IGarageService GarageService { get; }
 
         IVehicleInGarageService VehicleInGarageService { get; set; }
+
+        IApplicationService ApplicationService { get; }
     }
 }

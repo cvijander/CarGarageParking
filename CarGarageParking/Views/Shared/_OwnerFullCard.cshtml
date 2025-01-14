@@ -1,0 +1,43 @@
+﻿@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model)
+
+<h2>Vehicles</h2>
+
+<ul class="vehicle-list">
+    @foreach(Vehicle singleVehicle in Model.Vehicles)
+    {
+        <li>Licence plate:<span class="licence-plate"> @singleVehicle.LicencePlate</span></li>
+    }
+</ul>
+
+<style>
+    .vehicle-list
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        list-style-type:none;
+       }
+
+        .vehicle-list li {
+            margin: 10px 0;
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            
+        }
+
+       .vehicle-list li span.licence-plate {
+                text-transform: uppercase; 
+       }
+        
+</style>

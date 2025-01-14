@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CarGarageParking.Models.Owner>
+﻿@model IEnumerable<CarGarageParking.ViewModel.ApplicationRegistrationViewModel>
 
 @{
     ViewData["Title"] = "Hello Owner";
@@ -23,9 +23,10 @@
 
 
 <div>
-    @foreach (Owner single in Model)
+    @foreach (var single in Model)
     {
-        @await Html.PartialAsync("_OwnerCard", single);
+        @await Html.PartialAsync("_OwnerBasicCard", single, new ViewDataDictionary(ViewData) { { "ShowLink", true } })
+        
     }
 </div>
 

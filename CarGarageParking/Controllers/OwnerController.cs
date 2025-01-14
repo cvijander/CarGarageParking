@@ -1,5 +1,6 @@
 ﻿using CarGarageParking.Models;
 using CarGarageParking.Services;
+using CarGarageParking.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
@@ -39,7 +40,15 @@ namespace CarGarageParking.Controllers
                 owners = owners.Where(o => o.Vehicles.Count() == numberOfCars);
             }
 
-            return View(owners);
+            var app = owners.Select(o => new ApplicationRegistrationViewModel
+            {
+                Owner = o,
+                NumberOfVehicles = o.Vehicles.Count(),
+                Vehicles = o.Vehicles.ToList()
+            }).ToList();
+            
+
+            return View(app);
         }
 
         public IActionResult Info(int id)

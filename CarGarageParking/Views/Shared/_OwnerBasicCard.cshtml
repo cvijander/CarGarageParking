@@ -1,0 +1,55 @@
+﻿
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+<div class="container owner-card-look">
+    <h2>Name: @Model.Owner.FirstName</h2>
+    <h3>Lastname: @Model.Owner.LastName</h3>
+    <p>Number of cars: @Model.NumberOfVehicles</p>
+
+    @if (ViewData.ContainsKey("ShowLink") && (bool)ViewData["ShowLink"])
+    {
+        <a href="@Url.Action("Info","Owner", new {id = Model.Owner.OwnerId})">View more info about cars</a>
+    }
+</div>
+
+
+<style>
+    .owner-card-look
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+       }
+
+        .owner-card-look h2,
+        .owner-card-look h3,
+        .owner-card-look p {
+            margin: 10px 0;
+            color: #555; 
+        }
+
+       .owner-card-look a {
+           color: white;
+           text-align:center;
+           text-decoration:none;
+           text-transform:uppercase;
+       }
+
+       .owner-card-look a:hover {
+
+           color: yellow;
+           text-align: center;
+           text-decoration:none;
+           text-transform: lowercase;
+       }
+</style>

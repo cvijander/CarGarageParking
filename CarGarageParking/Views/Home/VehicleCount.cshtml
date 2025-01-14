@@ -1,0 +1,36 @@
+﻿
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Choose a nuber of cars";
+}
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+
+<h1>Step 2 of 4: Select number of vehicles </h1>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model, new ViewDataDictionary(ViewData) { { "ShowLink", false } })
+
+<form asp-action="VehicleCount" asp-controller="Home" method="post">
+    <input type="hidden" asp-for="Owner.FirstName" />
+    <input type="hidden" asp-for="Owner.LastName" />
+    <div class="form-group">
+        <label asp-for="NumberOfVehicles" class="form-label">Number of vehicles</label>
+        <input type="number" asp-for="NumberOfVehicles" step="1" min="1" max="10" class="form-control" />
+    </div>
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">Next</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+        <a href="@Url.Action("Index","Home")" class="btn btn-warning">Back to index</a>
+    </div>
+</form>
+
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+        Step 2 of 4
+    </div>
+</div>

@@ -16,6 +16,8 @@
 
             VehicleInGarageService = new VehicleInGarageService(context);
 
+            ApplicationService = new ApplicationService(context);
+
         }
 
         public IOwnerService OwnerService { get; private set; }
@@ -24,6 +26,8 @@
 
         public IGarageService GarageService { get; private set; }
         public IVehicleInGarageService VehicleInGarageService { get; set; }
+
+        public IApplicationService ApplicationService { get; set; }
 
         public void SaveChanges()
         {
