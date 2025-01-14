@@ -2722,13 +2722,122 @@ Njihova primena kako kod Use Case za uloazak vozila , tako i za listovanje garaz
 ```
 
 
+### 13) Kreiranje partial view za `Owner` dva modela ,jedan sa Half informacijama i drugi full sa listom vozila
+
+`_OwnerBasicCard` 
+```csharp
 
 
- 
-### 13) 
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+<div class="container owner-card-look">
+    <h2>Name: @Model.Owner.FirstName</h2>
+    <h3>Lastname: @Model.Owner.LastName</h3>
+    <p>Number of cars: @Model.NumberOfVehicles</p>
+
+    @if (ViewData.ContainsKey("ShowLink") && (bool)ViewData["ShowLink"])
+    {
+        <a href="@Url.Action("Info","Owner", new {id = Model.Owner.OwnerId})">View more info about cars</a>
+    }
+</div>
 
 
-  
+<style>
+    .owner-card-look
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+       }
+
+        .owner-card-look h2,
+        .owner-card-look h3,
+        .owner-card-look p {
+            margin: 10px 0;
+            color: #555; 
+        }
+
+       .owner-card-look a {
+           color: white;
+           text-align:center;
+           text-decoration:none;
+           text-transform:uppercase;
+       }
+
+       .owner-card-look a:hover {
+
+           color: yellow;
+           text-align: center;
+           text-decoration:none;
+           text-transform: lowercase;
+       }
+</style>
+```
+
+`_OwnerFullCard`
+
+```csharp
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model)
+
+<h2>Vehicles</h2>
+
+<ul class="vehicle-list">
+    @foreach(Vehicle singleVehicle in Model.Vehicles)
+    {
+        <li>Licence plate:<span class="licence-plate"> @singleVehicle.LicencePlate</span></li>
+    }
+</ul>
+
+<style>
+    .vehicle-list
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        list-style-type:none;
+       }
+
+        .vehicle-list li {
+            margin: 10px 0;
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            
+        }
+
+       .vehicle-list li span.licence-plate {
+                text-transform: uppercase; 
+       }
+        
+</style>
+```
+
+U basic card imamo samo inforacije o korisniku i broju vozila , dok u prosirenom obliku mi importujemo sam taj oblik basic i dodajemo kroz for petlju spisak svih licence tj sve tablice koje su kod korisnika
+
+
+
+### 14) Kreiranje 2 Use case dijagrama, pravljenje korisnika sa vozilima 
+
 
        
 
