@@ -3208,6 +3208,37 @@ namespace CarGarageParking.Controllers
     }
 }
 ```
+ - 1  pocinjemo od kreiranjem `ApplicationRegistrationViewModel` koji je zaduzen za preuzimanje podataka, od ownera, kolicine vozila i listu vozila
+
+   `ApplicationRegistrationViewModel`
+
+   ```csharp
+   using CarGarageParking.Models;
+using System.ComponentModel.DataAnnotations;
+
+namespace CarGarageParking.ViewModel
+{
+    public class ApplicationRegistrationViewModel
+    {
+        [Required]
+        public Owner Owner { get; set; }
+
+        [Range(1, 10, ErrorMessage = "You can register between 1 and 10 vehicles.")]
+        public int NumberOfVehicles { get; set; } = 1;
+
+        public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
+        public ApplicationRegistrationViewModel()
+        {
+            Owner = new Owner(); 
+            Vehicles = new List<Vehicle>(); 
+        }
+    }
+}
+```
+
+ -2 Nakon kreiranja pozivamo prvu akciju RegisterUser , za koju vidimo da ne prima parametre ali kao takva pravi instancu novog objekta i tu instancu prosledje na view 
+![Registracija korisnika](CarGarageParking/docs/images/RegisterUser.jpg)
 
 Akcija `RegistreUser` za `Home` contorler
 
@@ -3222,7 +3253,7 @@ Akcija `RegistreUser` za `Home` contorler
             return View(model);
         }
 ```
-
+- 3 Na view dobijamo kao model upravo objekat koji smo prosledili cisto da bi korsicenjem asp-for tagova znali koje properije mozemo da koristimo a opet nakon popunjavanja forme te podatke prosledjujemo u `post` obliku na akciju `RegisterUser`
 view za istu akciju 
 
 ```csharp
@@ -3267,7 +3298,7 @@ view za istu akciju
 </div>
 
 ```
-
+ - 4 Na ovoj post metodi mi dobijamo podate o owneru , first name i last name i nakon toga moramo zbog kompletksnosti da te podatke "rasturimo" na manje `string firstNeme` i `string lastName` koje prosledjujemo na sledeci view sa pozivom ka novoj akciji 
 i post metoda za istu akciju 
 
 ```csharp
@@ -3290,10 +3321,93 @@ i post metoda za istu akciju
  }
 ```
 
+- 5 Na ovoj stranici tj get metodi prihvatamo podatke tj `string firstNeme` i `string lastName` koje smo dobili , pravimo opet instancu modela, popunjvamamo sa podacima koje imamo a tu su firstname i last name i sada taj model prosledjumo na view 
+
+```csharp
+[HttpGet]
+public IActionResult VehicleCount(string firstName, string lastName)
+{
+    var model = new ApplicationRegistrationViewModel();
+    model.Owner = new Owner();
+    model.Owner.FirstName = firstName;
+    model.Owner.LastName = lastName;
+
+    return View(model);
+}
+```
+- 6 - view kao takav prihvata model , ali na njemu zbog prenosa podataka kreiamo i hidden polja za firstname i lastname i kao do sada popunjavamo formu koja je sada samo kolcina vozila
+
+  ```csharp
+  
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Choose a nuber of cars";
+}
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+
+<h1>Step 2 of 4: Select number of vehicles </h1>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model, new ViewDataDictionary(ViewData) { { "ShowLink", false } })
+
+<form asp-action="VehicleCount" asp-controller="Home" method="post">
+    <input type="hidden" asp-for="Owner.FirstName" />
+    <input type="hidden" asp-for="Owner.LastName" />
+    <div class="form-group">
+        <label asp-for="NumberOfVehicles" class="form-label">Number of vehicles</label>
+        <input type="number" asp-for="NumberOfVehicles" step="1" min="1" max="10" class="form-control" />
+    </div>
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">Next</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+        <a href="@Url.Action("Index","Home")" class="btn btn-warning">Back to index</a>
+    </div>
+</form>
+
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+        Step 2 of 4
+    </div>
+</div>
+```
+
+- 7 - nakon uspesnog submitovanja former mi se vracamo na post metodu, koja sada prihvata ceo model i mi na osnovu unete kolicine NumberOfVehicles mozemo da kroz for petlju kreiramo koliko je vozila potrebno
+   kao i u prethodnom obliku zbor prenosa podataka, mi ovaj prenos rasturamo sada na 3 dela, firstname, lastname i numberofvehicles i to sve prolsejujemo na novu akciju 
+
+  ```csharp
+   [HttpPost]
+ [ValidateAntiForgeryToken]
+ public IActionResult VehicleCount(ApplicationRegistrationViewModel model)
+ {
+     if (model.NumberOfVehicles < 1 || model.NumberOfVehicles > 10)
+     {
+         ModelState.AddModelError("", "You can register between 1 to 10");
+         return View(model);
+     }
 
 
 
-![Registracija korisnika](CarGarageParking/docs/images/RegisterUser.jpg)
+     for (int i = 0; i < model.NumberOfVehicles; i++)
+     {
+         model.Vehicles.Add(new Vehicle());
+     }
+
+
+     return RedirectToAction("LicenceInput", new
+     {
+         firstName = model.Owner.FirstName,
+         lastName = model.Owner.LastName,
+         numberOfVehicles = model.NumberOfVehicles
+     });
+ }
+```
+
+
 
 ![Registracija korisnika](CarGarageParking/docs/images/VehicleCount.jpg)
 
