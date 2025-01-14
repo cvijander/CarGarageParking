@@ -3212,7 +3212,7 @@ namespace CarGarageParking.Controllers
 
    `ApplicationRegistrationViewModel`
 
-   ```csharp
+```csharp
    using CarGarageParking.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -3237,8 +3237,13 @@ namespace CarGarageParking.ViewModel
 }
 ```
 
+`RegisterUser`
+
  -2 Nakon kreiranja pozivamo prvu akciju RegisterUser , za koju vidimo da ne prima parametre ali kao takva pravi instancu novog objekta i tu instancu prosledje na view 
+
+ 
 ![Registracija korisnika](CarGarageParking/docs/images/RegisterUser.jpg)
+
 
 Akcija `RegistreUser` za `Home` contorler
 
@@ -3253,8 +3258,10 @@ Akcija `RegistreUser` za `Home` contorler
             return View(model);
         }
 ```
+
 - 3 Na view dobijamo kao model upravo objekat koji smo prosledili cisto da bi korsicenjem asp-for tagova znali koje properije mozemo da koristimo a opet nakon popunjavanja forme te podatke prosledjujemo u `post` obliku na akciju `RegisterUser`
 view za istu akciju 
+
 
 ```csharp
 @model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
@@ -3298,8 +3305,10 @@ view za istu akciju
 </div>
 
 ```
+
  - 4 Na ovoj post metodi mi dobijamo podate o owneru , first name i last name i nakon toga moramo zbog kompletksnosti da te podatke "rasturimo" na manje `string firstNeme` i `string lastName` koje prosledjujemo na sledeci view sa pozivom ka novoj akciji 
 i post metoda za istu akciju 
+
 
 ```csharp
  [HttpPost]
