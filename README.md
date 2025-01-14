@@ -2550,3 +2550,306 @@ Korsink zatim ima mogucnost da unese vozilo, ako je vozilo u garaizi ,dobija gre
 ```
 
  --- 12 use kace 
+### 12) Kreiranje partial view za Garage dva modela ,jedan sa Half informacijama i drugi full sa listom vozila
+Njihova primena kako kod Use Case za uloazak vozila , tako i za listovanje garaza u okviru `Index` i `Info` na `Garage` kontroleru
+
+`_GarageHalfCard`
+
+```csharp
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model CarGarageParking.Models.Garage
+
+<head>
+
+    <link rel="stylesheet" href="~/css/GarageCard.css" />
+
+
+    @{
+        ViewData["Title"] = $"{Model.Name} {Model.Location} half-info";
+    }
+</head>
+
+         <div class="garage-info">
+                <h2 class="text-primary"><strong>Garage name: </strong>@Model.Name</h2>
+                <h3 class="text-muted"><strong>Garage location:</strong> @Model.Location</h3>
+                <h3 class="text-success"><strong>Available spots: </strong>@Model.AvailableSpots</h3>
+                @{
+                    decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
+                }
+                <h3>Percent of ocupancy: @OcupancyPercent.ToString("F2") %</h3>
+                @if(ViewData.ContainsKey("ShowLink") && (bool)ViewData["ShowLink"])
+                {
+                    <a href="@Url.Action("EnterVehicleDetails","Home", new { id = Model.GarageId} )" class="btn btn-primary">Select a garage to enter</a>
+                }
+                @if (ViewData.ContainsKey("ShowLinkGarage") && (bool)ViewData["ShowLinkGarage"])
+                {
+                    <a href="@Url.Action("Info","Garage", new { id = Model.GarageId} )" class="btn btn-primary">View more info</a>
+                }
+
+         </div>
+      
+```
+
+
+`_GarageFullCard`
+
+```csharp
+
+@model CarGarageParking.Models.Garage
+<head>
+    <link rel="stylesheet" href="~/css/GarageCard.css" />
+
+    @{
+        ViewData["Title"] = $"{Model.Name} {Model.Location} full-info";
+    }
+
+</head>
+
+
+
+<div class="garage-info">
+    <h2 class="text-black"><strong>Garage id: </strong>@Model.GarageId</h2>
+    <h2 class="text-black-50"><strong>Garage name: </strong>@Model.Name</h2>
+    <h3 class="text-muted"><strong>Garage location:</strong> @Model.Location</h3>
+    <h3 class="text-muted"><strong>Garage capacity: </strong> @Model.Capacity</h3>
+    <h4 class="text-muted"><strong>Garage current capacity: </strong> @Model.CurrentOccupancy</h4>
+    @{
+        decimal OcupancyPercent = ((decimal)Model.CurrentOccupancy / Model.Capacity) * 100;
+    }
+    <h3>Percent: @OcupancyPercent.ToString("F2") %</h3>
+    <h3 class="text-success"><strong>Available spots: </strong>@Model.AvailableSpots</h3>
+    <h4 class="text-black"><em> @(Model.IsFull ? "Yes, there is no more spaces": "No, there are more available spots")</em></h4>
+    
+    <div class="vhg">
+        <h3 class="text-primary">Vehicle currentu in garage: </h3>
+        <ul class="list-group">
+            @foreach (VehicleInGarage singleVehicle in Model.VehicleInGarages)
+            {
+                <li class="list-goup-item">
+                    <h4 class="text-muted"><strong>Vehicle licence plate:</strong> @singleVehicle.Vehicle.LicencePlate </h4>
+                    @if(singleVehicle.Vehicle.Owner !=null)
+                    {
+                        <h4 class="text-muted"><strong>Vehicle owner:</strong> @(singleVehicle.Vehicle.Owner.FirstName + singleVehicle.Vehicle.Owner.LastName)</h4>
+                    }
+                    else
+                    {
+                        <h4 class="text-muted"><strong>Vehicle owner:</strong> Unknown</h4>
+                    }
+
+                </li>
+            }
+        </ul>
+   </div> 
+   <a href ="@Url.Action("Index","Garage")" class="btn btn-primary">Back to garages</a>
+</div>
+```
+
+
+`Index`  akcija na `Garage` kontroleru 
+
+```csharp
+@model CarGarageParking.ViewModel.PaginationViewModel<Garage>
+
+    @{
+        ViewData["Title"] = "Show all garages";
+    }
+
+  
+ 
+    <form asp-action="Index" asp-controller="Garage" method="get">
+        <label for="name">Name:</label> 
+        <input type="text" id="name" name="name" value="@Context.Request.Query["name"]" />
+
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" value="@Context.Request.Query["location"]" />
+
+        <label for="maxCapacity">Capacity</label>
+        <input type="number" id="maxCapacity" name="maxCapacity" value="@Context.Request.Query["maxCapacity"]" />
+
+        <label for="availableSpots">Available spots</label>
+        <input type="number" id="availableSpots"  name="availableSpots" value="@Context.Request.Query["availableSpots"]" />
+
+          <!--   <label for="percent">Procenat popunjenosti</label>-->
+        <!--  <input type="number" id="percent" name="percent" value="@Context.Request.Query["percent"]" />-->
+        
+
+        <button type="submit" class="btn btn-primary">Submit</button>        
+        <a href="@Url.Action("Index","Garage")" class="btn btn-secondary" >Clear</a>
+    </form>
+
+
+
+<div class="garage-list">
+    @foreach (Garage singleGarage in Model.Collection)
+    {
+        <div class="garage-solo">            
+            @await Html.PartialAsync("_GarageHalfCard", singleGarage, new ViewDataDictionary(ViewData) { { "ShowLinkGarage", true } })                         
+        </div>
+    }
+</div>
+
+
+
+@await Html.PartialAsync("_PaginationViewIndex",Model)
+
+```
+
+`Info` akcija na `garage` kontroileru
+
+```csharp
+@model CarGarageParking.Models.Garage;
+
+    @{
+        ViewData["Title"] = $"{Model.Name}{Model.Location}";
+    }
+
+
+
+<h2>@Model.Name @Model.Location</h2>
+
+<div>
+    @await Html.PartialAsync("_GarageFullCard", Model, new ViewDataDictionary(ViewData) { { "ShowLinkFullGarage", false } })
+</div>
+
+
+<a href="@Url.Action("Index", "Garage")" class=" btn btn-primary">Back to all garages</a>
+<a href="@Url.Action("Edit","Garage", new {id = Model.GarageId })" class="btn btn-secondary">Edit a garage</a>
+<a href="@Url.Action("Delete","Garage",new {id = Model.GarageId})" class="btn btn-danger">Delete</a>
+```
+
+
+### 13) Kreiranje partial view za `Owner` dva modela ,jedan sa Half informacijama i drugi full sa listom vozila
+
+`_OwnerBasicCard` 
+```csharp
+
+
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+<div class="container owner-card-look">
+    <h2>Name: @Model.Owner.FirstName</h2>
+    <h3>Lastname: @Model.Owner.LastName</h3>
+    <p>Number of cars: @Model.NumberOfVehicles</p>
+
+    @if (ViewData.ContainsKey("ShowLink") && (bool)ViewData["ShowLink"])
+    {
+        <a href="@Url.Action("Info","Owner", new {id = Model.Owner.OwnerId})">View more info about cars</a>
+    }
+</div>
+
+
+<style>
+    .owner-card-look
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+       }
+
+        .owner-card-look h2,
+        .owner-card-look h3,
+        .owner-card-look p {
+            margin: 10px 0;
+            color: #555; 
+        }
+
+       .owner-card-look a {
+           color: white;
+           text-align:center;
+           text-decoration:none;
+           text-transform:uppercase;
+       }
+
+       .owner-card-look a:hover {
+
+           color: yellow;
+           text-align: center;
+           text-decoration:none;
+           text-transform: lowercase;
+       }
+</style>
+```
+
+`_OwnerFullCard`
+
+```csharp
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model)
+
+<h2>Vehicles</h2>
+
+<ul class="vehicle-list">
+    @foreach(Vehicle singleVehicle in Model.Vehicles)
+    {
+        <li>Licence plate:<span class="licence-plate"> @singleVehicle.LicencePlate</span></li>
+    }
+</ul>
+
+<style>
+    .vehicle-list
+       {
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 20px;
+        margin: 20px 0;
+        background-color: #f4f4f4;
+        color: #333;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        list-style-type:none;
+       }
+
+        .vehicle-list li {
+            margin: 10px 0;
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+            
+        }
+
+       .vehicle-list li span.licence-plate {
+                text-transform: uppercase; 
+       }
+        
+</style>
+```
+
+U basic card imamo samo inforacije o korisniku i broju vozila , dok u prosirenom obliku mi importujemo sam taj oblik basic i dodajemo kroz for petlju spisak svih licence tj sve tablice koje su kod korisnika
+
+
+
+### 14) Kreiranje 2 Use case dijagrama, pravljenje korisnika sa vozilima 
+
+
+       
+
+
+
+
+
+
+
+    
+        
+
+       
+
+       
