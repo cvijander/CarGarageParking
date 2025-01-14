@@ -3330,7 +3330,11 @@ i post metoda za istu akciju
  }
 ```
 
+![Registracija korisnika](CarGarageParking/docs/images/VehicleCount.jpg)
+
 - 5 Na ovoj stranici tj get metodi prihvatamo podatke tj `string firstNeme` i `string lastName` koje smo dobili , pravimo opet instancu modela, popunjvamamo sa podacima koje imamo a tu su firstname i last name i sada taj model prosledjumo na view 
+
+`Vehiclecount`
 
 ```csharp
 [HttpGet]
@@ -3344,9 +3348,12 @@ public IActionResult VehicleCount(string firstName, string lastName)
     return View(model);
 }
 ```
+
+
 - 6 - view kao takav prihvata model , ali na njemu zbog prenosa podataka kreiamo i hidden polja za firstname i lastname i kao do sada popunjavamo formu koja je sada samo kolcina vozila
 
-  ```csharp
+
+```csharp
   
 @model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
 
@@ -3388,7 +3395,7 @@ public IActionResult VehicleCount(string firstName, string lastName)
 - 7 - nakon uspesnog submitovanja former mi se vracamo na post metodu, koja sada prihvata ceo model i mi na osnovu unete kolicine NumberOfVehicles mozemo da kroz for petlju kreiramo koliko je vozila potrebno
    kao i u prethodnom obliku zbor prenosa podataka, mi ovaj prenos rasturamo sada na 3 dela, firstname, lastname i numberofvehicles i to sve prolsejujemo na novu akciju 
 
-  ```csharp
+```csharp
    [HttpPost]
  [ValidateAntiForgeryToken]
  public IActionResult VehicleCount(ApplicationRegistrationViewModel model)
@@ -3418,7 +3425,7 @@ public IActionResult VehicleCount(string firstName, string lastName)
 
 
 
-![Registracija korisnika](CarGarageParking/docs/images/VehicleCount.jpg)
+
 
 ![Registracija korisnika](CarGarageParking/docs/images/LicenceInput.jpg)
 
