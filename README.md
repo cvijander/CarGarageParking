@@ -2838,10 +2838,35 @@ U basic card imamo samo inforacije o korisniku i broju vozila , dok u prosirenom
 
 ### 14) Kreiranje 2 Use case dijagrama, pravljenje korisnika sa vozilima 
 
+SK: Slucaj koriscenja - Registracija korisnika sa vozilima
+Naziv SK Registracija korisnika sa vozilima
 
+Aktori SK Korisnik
+
+Ucesnici SK Korisnik i sistem
+
+Preduslov : Da korisnik ima barem jedan automobil 
+
+Osnovni scenario
+
+Korsnik unosi osnovne podatke, ime i prezime
+Kornisk unosi koliko vozila zeli da unese 
+Korisnik unosi licence plate  shodnu broju koju  je uneo u prethodnom koraku 
+Korisnik dobija podatke o unetim tablica 
+Korisnik dobija potvrdui da je uspesno uneo 
+
+Korisnik unosi osnovne podatke, ime i prezime , pri cemu nakon klika Next unosi kolicinu vozila od 1 -10 i nakon sledeceg nexta unosi za svako vozilo licence plate .Nakon unosa dobija stranicu sa svim podacima gde ako zeli moze da ponisti ili potvrdi i nakon potvde dobija stranicu succes tj povrdu da je uspesno uneo sve podatke i vozila .
        
 
+![Registracija korisnika](CarGarageParking/docs/images/RegisterUser.jpg)
 
+![Registracija korisnika](CarGarageParking/docs/images/VehicleCount.jpg)
+
+![Registracija korisnika](CarGarageParking/docs/images/LicenceInput.jpg)
+
+![Registracija korisnika](CarGarageParking/docs/images/ConfirmApplication.jpg)
+
+![Registracija korisnika](CarGarageParking/docs/images/Success.jpg)
 
 
 
