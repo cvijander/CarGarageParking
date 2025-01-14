@@ -2836,7 +2836,7 @@ U basic card imamo samo inforacije o korisniku i broju vozila , dok u prosirenom
 
 
 
-### 14) Kreiranje 2 Use case dijagrama, pravljenje korisnika sa vozilima 
+### 14) Kreiranje 2. Use case dijagrama, pravljenje korisnika sa vozilima 
 
 SK: Slucaj koriscenja - Registracija korisnika sa vozilima
 Naziv SK Registracija korisnika sa vozilima
@@ -3392,6 +3392,9 @@ public IActionResult VehicleCount(string firstName, string lastName)
 </div>
 ```
 
+
+
+
 - 7 - nakon uspesnog submitovanja former mi se vracamo na post metodu, koja sada prihvata ceo model i mi na osnovu unete kolicine NumberOfVehicles mozemo da kroz for petlju kreiramo koliko je vozila potrebno
    kao i u prethodnom obliku zbor prenosa podataka, mi ovaj prenos rasturamo sada na 3 dela, firstname, lastname i numberofvehicles i to sve prolsejujemo na novu akciju 
 
@@ -3423,17 +3426,232 @@ public IActionResult VehicleCount(string firstName, string lastName)
  }
 ```
 
-
-
-
-
 ![Registracija korisnika](CarGarageParking/docs/images/LicenceInput.jpg)
+
+ - 8 - Sada ponovo prosledjujemo raspracane stvari , `Firstname` , `Lastname`, `NumberofVehicles` i jedan sting koji je `LicencePlates` koji predstavlja sve tablice na jednom mestu spojene  i sada kreiramo model koji sadrzi sve to podatke koje smo prosledili
+    i sada taj model prosledjujemo u view 
+
+`LicenceInput`
+
+```csharp
+ [HttpGet]
+ public IActionResult LicenceInput(string firstName, string lastName, int numberOfVehicles)
+ {
+     try
+     {
+         var model = new ApplicationRegistrationViewModel();
+         model.Owner = new Owner();
+         model.Owner.FirstName = firstName;
+         model.Owner.LastName = lastName;
+         model.NumberOfVehicles = numberOfVehicles;
+         model.Vehicles = new List<Vehicle>();
+        
+
+         for (int i = 0; i < numberOfVehicles; i++)
+         {
+             model.Vehicles.Add(new Vehicle());
+         }
+
+         return View(model);
+     }
+     catch (Exception ex)
+     {
+         
+         Console.WriteLine(ex.Message);
+         throw;
+     }
+ }
+```
+
+ - 9  - view za ovu akciju 
+
+ gde opet na view imamo i sakrivena polja da bi smo mogli da ih prosledimo
+ 
+```csharp
+
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Enter vehicle data";
+}
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+
+<h1>Step 3 of 4 Enter vehicle details</h1>
+
+@await Html.PartialAsync("_OwnerBasicCard", Model, new ViewDataDictionary(ViewData) { { "ShowLink", false } })
+
+
+<form asp-action="LicenceInput" asp-controller="Home" method="post">
+    <input type="hidden" asp-for="Owner.FirstName" />
+    <input type="hidden" asp-for="Owner.LastName" />
+    <input type="hidden" asp-for="NumberOfVehicles" />
+
+    @for (int i =0; i < Model.Vehicles.Count; i++)
+    {
+        <div class="form-group">
+            <label asp-for="Vehicles[@i].LicencePlate">Vehicle @(@i + 1) - Licence Plate</label>
+            <input type="text" asp-for="Vehicles[@i].LicencePlate" class="form-control" required />
+            <span asp-validation-for="Vehicles[@i].LicencePlate" class="text-danger"></span>
+        </div>
+    }
+    <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">next</button>
+        <button type="reset" class="btn btn-secondary">reset</button>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-warning">Back to index</a>
+    </div>
+    </form>
+
+
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+        Step 3 of 4
+    </div>
+</div>
+
+```
+
+- 10 - i post metoda koja prihvata model koji smo prosledili , i opet ga rasparavamo da bi smo ga prosledili ponovo u sitne delove 
+
+  ```csharp
+   [HttpPost]
+ [ValidateAntiForgeryToken]
+ public IActionResult LicenceInput(ApplicationRegistrationViewModel model)
+ {
+     if(!ModelState.IsValid)
+     {
+         return View("LicenceInput", model);
+     }                                 
+
+     return RedirectToAction("ConfirmApplication", new
+     {
+         firstName = model.Owner.FirstName,
+         lastName = model.Owner.LastName,
+         numberOfVehicles = model.NumberOfVehicles,
+         licencePlates = string.Join(",",model.Vehicles.Select(v => v.LicencePlate))
+     });
+ }
+ ```
+
+- 11 - na ovom `ConfirmApplication` vidimo sve podatke korisnika koje smo dobili isto iseckano , kreriramo model i prosledjujemo ga na view 
 
 ![Registracija korisnika](CarGarageParking/docs/images/ConfirmApplication.jpg)
 
+```csharp
+[HttpGet]
+public IActionResult ConfirmApplication(string firstName, string lastName, int numberOfVehicles, string licencePlates)
+{
+    var model = new ApplicationRegistrationViewModel();
+    model.Owner =  new Owner();
+    model.Owner.FirstName = firstName;
+    model.Owner.LastName = lastName;
+    model.NumberOfVehicles = numberOfVehicles;
+    model.Vehicles = licencePlates.Split(',').Select(lp => new Vehicle { LicencePlate = lp }).ToList();
+    
+    return View(model);
+}
+
+```
+
+- 12 - view na ovom view radimo konfirmaciju i kao sto vidimo opet imamo hiden polje 
+
+  ```csharp
+  
+@model CarGarageParking.ViewModel.ApplicationRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Confirm Application";
+}
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/css/GarageIntro.css" />
+</head>
+
+<h1>Step 4 of 4: Confirm Application</h1>
+
+@await Html.PartialAsync("_OwnerFullCard",Model)
+
+
+
+<form asp-action="ConfirmApplication" asp-controller="Home" method="post">
+    <input type="hidden" asp-for="Owner.FirstName" />
+    <input type="hidden" asp-for="Owner.LastName" />
+    <input type="hidden" asp-for="NumberOfVehicles" />
+
+    @for (int i =0; i< Model.NumberOfVehicles; i++)
+    {
+        <input type="hidden" asp-for="Vehicles[@i].LicencePlate" />
+    }
+    <button type="submit" class="btn btn-success">Confirm</button>
+    <a href="@Url.Action("Index", "Home")" class="btn btn-danger">Cancel</a>
+</form>
+
+<div class="progress mt-4">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+        Step 4 of 4
+    </div>
+</div>
+```
+
+- 13 - i post metoda koja je zaduzena za snimanje podataka gde sad konacno pozivamo i pravimo instancu nase Aplikacije i sada podatke iz naseg viewmodela prebacujemo u napravljeno uinstancu Application i opet vrsimo rasparciovanje podatka
+- kako bi prosledili na nasu novu stranicu 
+
+```csharp
+ [HttpPost]
+ [ValidateAntiForgeryToken]
+ public IActionResult ConfirmApplication(ApplicationRegistrationViewModel model)
+ {
+     if (!ModelState.IsValid)
+     {
+         return View("ConfirmationApplication", model);
+     }
+
+     Application application = new Application();
+     application.Owner = model.Owner;
+     application.Vehicles = model.Vehicles;
+     application.Credit = 100;
+     application.HasActiveMembership = true;
+
+     _unitOfWork.ApplicationService.AddApplication(application);
+     _unitOfWork.SaveChanges();
+
+     
+
+     
+     return RedirectToAction("Success" , new
+     {
+         firstName = model.Owner.FirstName,
+         lastName = model.Owner.LastName,
+         numberOfVehicles = model.NumberOfVehicles,
+         licencePlates = string.Join(",",model.Vehicles.Select(v => v.LicencePlate))
+     });
+ }
+```
+
+- 14 - Dakle dobijamo `Success` strnicu koja prima sve rasparcane elenemte i samo vrsimo prikaz tih podataka
+  
 ![Registracija korisnika](CarGarageParking/docs/images/Success.jpg)
 
 
+```csharp
+ [HttpGet]
+ public IActionResult Success (string firstName, string lastName, int numberOfVehicles,string licencePlates)
+ {
+     var model = new ApplicationRegistrationViewModel();
+     model.Owner.FirstName = firstName;
+     model.Owner.LastName = lastName;
+     model.NumberOfVehicles = numberOfVehicles;
+     model.Vehicles = licencePlates.Split(',').Select(lp => new Vehicle { LicencePlate = lp }).ToList();
+
+     ViewBag.SuccessMessage = "Application registered successfully!";
+
+     return View(model); 
+ }
+```
 
 
 
